@@ -4,12 +4,11 @@ use super::{
     zeropage_x_write,
 };
 use super::{AddressingMode, Cpu};
-use crate::Bus;
 
 impl Cpu {
     pub(crate) fn instruction_asl(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -29,7 +28,7 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let mut value = zeropage_read(self, bus, low_byte);
+                let mut value = zeropage_read(self, low_byte);
 
                 match (value & 0b1000_0000) != 0 {
                     true => self.processor_status.set_carry_flag(),
@@ -41,12 +40,12 @@ impl Cpu {
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
 
-                zeropage_write(self, bus, low_byte, value);
+                zeropage_write(self, low_byte, value);
 
                 5
             }
             AddressingMode::ZeropageXIndexed => {
-                let mut value = zeropage_x_read(self, bus, low_byte);
+                let mut value = zeropage_x_read(self, low_byte);
 
                 match (value & 0b1000_0000) != 0 {
                     true => self.processor_status.set_carry_flag(),
@@ -58,12 +57,12 @@ impl Cpu {
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
 
-                zeropage_x_write(self, bus, low_byte, value);
+                zeropage_x_write(self, low_byte, value);
 
                 6
             }
             AddressingMode::Absolute => {
-                let mut value = absolute_read(self, bus, low_byte, high_byte);
+                let mut value = absolute_read(self, low_byte, high_byte);
 
                 match (value & 0b1000_0000) != 0 {
                     true => self.processor_status.set_carry_flag(),
@@ -75,12 +74,12 @@ impl Cpu {
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
 
-                absolute_write(self, bus, low_byte, high_byte, value);
+                absolute_write(self, low_byte, high_byte, value);
 
                 6
             }
             AddressingMode::AbsoluteXIndexed => {
-                let (mut value, _) = absolute_x_read(self, bus, low_byte, high_byte);
+                let (mut value, _) = absolute_x_read(self, low_byte, high_byte);
 
                 match (value & 0b1000_0000) != 0 {
                     true => self.processor_status.set_carry_flag(),
@@ -92,7 +91,7 @@ impl Cpu {
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
 
-                absolute_x_write(self, bus, low_byte, high_byte, value);
+                absolute_x_write(self, low_byte, high_byte, value);
 
                 7
             }
@@ -102,7 +101,7 @@ impl Cpu {
 
     pub(crate) fn instruction_lsr(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -123,7 +122,7 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let mut value = zeropage_read(self, bus, low_byte);
+                let mut value = zeropage_read(self, low_byte);
 
                 match (value & 0b0000_0001) != 0 {
                     true => self.processor_status.set_carry_flag(),
@@ -136,12 +135,12 @@ impl Cpu {
                 self.processor_status.clear_carry_flag();
                 self.modify_zero_flag(value);
 
-                zeropage_write(self, bus, low_byte, value);
+                zeropage_write(self, low_byte, value);
 
                 5
             }
             AddressingMode::ZeropageXIndexed => {
-                let mut value = zeropage_x_read(self, bus, low_byte);
+                let mut value = zeropage_x_read(self, low_byte);
 
                 match (value & 0b0000_0001) != 0 {
                     true => self.processor_status.set_carry_flag(),
@@ -154,12 +153,12 @@ impl Cpu {
                 self.processor_status.clear_carry_flag();
                 self.modify_zero_flag(value);
 
-                zeropage_x_write(self, bus, low_byte, value);
+                zeropage_x_write(self, low_byte, value);
 
                 6
             }
             AddressingMode::Absolute => {
-                let mut value = absolute_read(self, bus, low_byte, high_byte);
+                let mut value = absolute_read(self, low_byte, high_byte);
 
                 match (value & 0b0000_0001) != 0 {
                     true => self.processor_status.set_carry_flag(),
@@ -172,12 +171,12 @@ impl Cpu {
                 self.processor_status.clear_carry_flag();
                 self.modify_zero_flag(value);
 
-                absolute_write(self, bus, low_byte, high_byte, value);
+                absolute_write(self, low_byte, high_byte, value);
 
                 6
             }
             AddressingMode::AbsoluteXIndexed => {
-                let (mut value, _) = absolute_x_read(self, bus, low_byte, high_byte);
+                let (mut value, _) = absolute_x_read(self, low_byte, high_byte);
 
                 match (value & 0b0000_0001) != 0 {
                     true => self.processor_status.set_carry_flag(),
@@ -190,7 +189,7 @@ impl Cpu {
                 self.processor_status.clear_carry_flag();
                 self.modify_zero_flag(value);
 
-                absolute_x_write(self, bus, low_byte, high_byte, value);
+                absolute_x_write(self, low_byte, high_byte, value);
 
                 7
             }
@@ -200,7 +199,7 @@ impl Cpu {
 
     pub(crate) fn instruction_rol(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -223,7 +222,7 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let mut value = zeropage_read(self, bus, low_byte);
+                let mut value = zeropage_read(self, low_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 
@@ -238,12 +237,12 @@ impl Cpu {
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
 
-                zeropage_write(self, bus, low_byte, value);
+                zeropage_write(self, low_byte, value);
 
                 5
             }
             AddressingMode::ZeropageXIndexed => {
-                let mut value = zeropage_read(self, bus, low_byte);
+                let mut value = zeropage_read(self, low_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 
@@ -258,12 +257,12 @@ impl Cpu {
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
 
-                zeropage_x_write(self, bus, low_byte, value);
+                zeropage_x_write(self, low_byte, value);
 
                 6
             }
             AddressingMode::Absolute => {
-                let mut value = zeropage_read(self, bus, low_byte);
+                let mut value = zeropage_read(self, low_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 
@@ -278,12 +277,12 @@ impl Cpu {
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
 
-                absolute_write(self, bus, low_byte, high_byte, value);
+                absolute_write(self, low_byte, high_byte, value);
 
                 6
             }
             AddressingMode::AbsoluteXIndexed => {
-                let mut value = zeropage_read(self, bus, low_byte);
+                let mut value = zeropage_read(self, low_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 
@@ -298,7 +297,7 @@ impl Cpu {
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
 
-                absolute_x_write(self, bus, low_byte, high_byte, value);
+                absolute_x_write(self, low_byte, high_byte, value);
 
                 7
             }
@@ -308,7 +307,7 @@ impl Cpu {
 
     pub(crate) fn instruction_ror(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -332,7 +331,7 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let mut value = zeropage_read(self, bus, low_byte);
+                let mut value = zeropage_read(self, low_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 
@@ -348,12 +347,12 @@ impl Cpu {
                 self.processor_status.clear_carry_flag();
                 self.modify_zero_flag(value);
 
-                zeropage_write(self, bus, low_byte, value);
+                zeropage_write(self, low_byte, value);
 
                 5
             }
             AddressingMode::ZeropageXIndexed => {
-                let mut value = zeropage_read(self, bus, low_byte);
+                let mut value = zeropage_read(self, low_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 
@@ -369,12 +368,12 @@ impl Cpu {
                 self.processor_status.clear_carry_flag();
                 self.modify_zero_flag(value);
 
-                zeropage_x_write(self, bus, low_byte, value);
+                zeropage_x_write(self, low_byte, value);
 
                 6
             }
             AddressingMode::Absolute => {
-                let mut value = zeropage_read(self, bus, low_byte);
+                let mut value = zeropage_read(self, low_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 
@@ -390,12 +389,12 @@ impl Cpu {
                 self.processor_status.clear_carry_flag();
                 self.modify_zero_flag(value);
 
-                absolute_write(self, bus, low_byte, high_byte, value);
+                absolute_write(self, low_byte, high_byte, value);
 
                 6
             }
             AddressingMode::AbsoluteXIndexed => {
-                let mut value = zeropage_read(self, bus, low_byte);
+                let mut value = zeropage_read(self, low_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 
@@ -411,7 +410,7 @@ impl Cpu {
                 self.processor_status.clear_carry_flag();
                 self.modify_zero_flag(value);
 
-                absolute_x_write(self, bus, low_byte, high_byte, value);
+                absolute_x_write(self, low_byte, high_byte, value);
 
                 7
             }

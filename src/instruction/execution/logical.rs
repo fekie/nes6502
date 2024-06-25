@@ -3,12 +3,11 @@ use super::{
     immediate_read, indirect_x_read, indirect_y_read, zeropage_read, zeropage_x_read,
 };
 use super::{AddressingMode, Cpu};
-use crate::Bus;
 
 impl Cpu {
     pub(crate) fn instruction_and(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -22,28 +21,28 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let value = zeropage_read(self, bus, low_byte) & self.accumulator;
+                let value = zeropage_read(self, low_byte) & self.accumulator;
                 self.accumulator = value;
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                let value = zeropage_x_read(self, bus, low_byte) & self.accumulator;
+                let value = zeropage_x_read(self, low_byte) & self.accumulator;
                 self.accumulator = value;
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
                 4
             }
             AddressingMode::Absolute => {
-                let value = absolute_read(self, bus, low_byte, high_byte) & self.accumulator;
+                let value = absolute_read(self, low_byte, high_byte) & self.accumulator;
                 self.accumulator = value;
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
                 4
             }
             AddressingMode::AbsoluteXIndexed => {
-                let (raw, page_changed) = absolute_x_read(self, bus, low_byte, high_byte);
+                let (raw, page_changed) = absolute_x_read(self, low_byte, high_byte);
                 let value = raw & self.accumulator;
 
                 self.accumulator = value;
@@ -56,7 +55,7 @@ impl Cpu {
                 }
             }
             AddressingMode::AbsoluteYIndexed => {
-                let (raw, page_changed) = absolute_y_read(self, bus, low_byte, high_byte);
+                let (raw, page_changed) = absolute_y_read(self, low_byte, high_byte);
                 let value = raw & self.accumulator;
 
                 self.accumulator = value;
@@ -69,7 +68,7 @@ impl Cpu {
                 }
             }
             AddressingMode::IndirectXIndexed => {
-                let value = indirect_x_read(self, bus, low_byte) & self.accumulator;
+                let value = indirect_x_read(self, low_byte) & self.accumulator;
 
                 self.accumulator = value;
                 self.modify_negative_flag(value);
@@ -78,7 +77,7 @@ impl Cpu {
                 6
             }
             AddressingMode::IndirectYIndexed => {
-                let (raw, page_changed) = indirect_y_read(self, bus, low_byte);
+                let (raw, page_changed) = indirect_y_read(self, low_byte);
                 let value = raw & self.accumulator;
 
                 self.accumulator = value;
@@ -96,7 +95,7 @@ impl Cpu {
 
     pub(crate) fn instruction_eor(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -110,28 +109,28 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let value = zeropage_read(self, bus, low_byte) ^ self.accumulator;
+                let value = zeropage_read(self, low_byte) ^ self.accumulator;
                 self.accumulator = value;
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                let value = zeropage_x_read(self, bus, low_byte) ^ self.accumulator;
+                let value = zeropage_x_read(self, low_byte) ^ self.accumulator;
                 self.accumulator = value;
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
                 4
             }
             AddressingMode::Absolute => {
-                let value = absolute_read(self, bus, low_byte, high_byte) ^ self.accumulator;
+                let value = absolute_read(self, low_byte, high_byte) ^ self.accumulator;
                 self.accumulator = value;
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
                 4
             }
             AddressingMode::AbsoluteXIndexed => {
-                let (raw, page_changed) = absolute_x_read(self, bus, low_byte, high_byte);
+                let (raw, page_changed) = absolute_x_read(self, low_byte, high_byte);
                 let value = raw ^ self.accumulator;
 
                 self.accumulator = value;
@@ -144,7 +143,7 @@ impl Cpu {
                 }
             }
             AddressingMode::AbsoluteYIndexed => {
-                let (raw, page_changed) = absolute_y_read(self, bus, low_byte, high_byte);
+                let (raw, page_changed) = absolute_y_read(self, low_byte, high_byte);
                 let value = raw ^ self.accumulator;
 
                 self.accumulator = value;
@@ -157,7 +156,7 @@ impl Cpu {
                 }
             }
             AddressingMode::IndirectXIndexed => {
-                let value = indirect_x_read(self, bus, low_byte) ^ self.accumulator;
+                let value = indirect_x_read(self, low_byte) ^ self.accumulator;
 
                 self.accumulator = value;
                 self.modify_negative_flag(value);
@@ -166,7 +165,7 @@ impl Cpu {
                 6
             }
             AddressingMode::IndirectYIndexed => {
-                let (raw, page_changed) = indirect_y_read(self, bus, low_byte);
+                let (raw, page_changed) = indirect_y_read(self, low_byte);
                 let value = raw ^ self.accumulator;
 
                 self.accumulator = value;
@@ -184,7 +183,7 @@ impl Cpu {
 
     pub(crate) fn instruction_ora(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -198,28 +197,28 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let value = zeropage_read(self, bus, low_byte) | self.accumulator;
+                let value = zeropage_read(self, low_byte) | self.accumulator;
                 self.accumulator = value;
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                let value = zeropage_x_read(self, bus, low_byte) | self.accumulator;
+                let value = zeropage_x_read(self, low_byte) | self.accumulator;
                 self.accumulator = value;
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
                 4
             }
             AddressingMode::Absolute => {
-                let value = absolute_read(self, bus, low_byte, high_byte) | self.accumulator;
+                let value = absolute_read(self, low_byte, high_byte) | self.accumulator;
                 self.accumulator = value;
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
                 4
             }
             AddressingMode::AbsoluteXIndexed => {
-                let (raw, page_changed) = absolute_x_read(self, bus, low_byte, high_byte);
+                let (raw, page_changed) = absolute_x_read(self, low_byte, high_byte);
                 let value = raw | self.accumulator;
 
                 self.accumulator = value;
@@ -232,7 +231,7 @@ impl Cpu {
                 }
             }
             AddressingMode::AbsoluteYIndexed => {
-                let (raw, page_changed) = absolute_y_read(self, bus, low_byte, high_byte);
+                let (raw, page_changed) = absolute_y_read(self, low_byte, high_byte);
                 let value = raw | self.accumulator;
 
                 self.accumulator = value;
@@ -245,7 +244,7 @@ impl Cpu {
                 }
             }
             AddressingMode::IndirectXIndexed => {
-                let value = indirect_x_read(self, bus, low_byte) | self.accumulator;
+                let value = indirect_x_read(self, low_byte) | self.accumulator;
 
                 self.accumulator = value;
                 self.modify_negative_flag(value);
@@ -254,7 +253,7 @@ impl Cpu {
                 6
             }
             AddressingMode::IndirectYIndexed => {
-                let (raw, page_changed) = indirect_y_read(self, bus, low_byte);
+                let (raw, page_changed) = indirect_y_read(self, low_byte);
                 let value = raw | self.accumulator;
 
                 self.accumulator = value;
@@ -272,14 +271,14 @@ impl Cpu {
 
     pub(crate) fn instruction_bit(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
     ) -> u8 {
         match addressing_mode {
             AddressingMode::Zeropage => {
-                let raw = zeropage_read(self, bus, low_byte);
+                let raw = zeropage_read(self, low_byte);
 
                 // check bit 7
                 match (raw & 0b1000_0000) != 0 {
@@ -298,7 +297,7 @@ impl Cpu {
                 3
             }
             AddressingMode::Absolute => {
-                let raw = absolute_read(self, bus, low_byte, high_byte);
+                let raw = absolute_read(self, low_byte, high_byte);
 
                 // check bit 7
                 match (raw & 0b1000_0000) != 0 {

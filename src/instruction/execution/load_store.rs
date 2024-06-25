@@ -1,11 +1,10 @@
 use super::*;
 use super::{AddressingMode, Cpu};
-use crate::Bus;
 
 impl Cpu {
     pub(crate) fn instruction_lda(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -21,7 +20,7 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let value = zeropage_read(self, bus, low_byte);
+                let value = zeropage_read(self, low_byte);
 
                 self.accumulator = value;
                 self.modify_negative_flag(value);
@@ -30,7 +29,7 @@ impl Cpu {
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                let value = zeropage_x_read(self, bus, low_byte);
+                let value = zeropage_x_read(self, low_byte);
 
                 self.accumulator = value;
                 self.modify_negative_flag(value);
@@ -39,7 +38,7 @@ impl Cpu {
                 4
             }
             AddressingMode::Absolute => {
-                let value = absolute_read(self, bus, low_byte, high_byte);
+                let value = absolute_read(self, low_byte, high_byte);
 
                 self.accumulator = value;
                 self.modify_negative_flag(value);
@@ -48,7 +47,7 @@ impl Cpu {
                 4
             }
             AddressingMode::AbsoluteXIndexed => {
-                let (value, page_changed) = absolute_x_read(self, bus, low_byte, high_byte);
+                let (value, page_changed) = absolute_x_read(self, low_byte, high_byte);
 
                 self.accumulator = value;
                 self.modify_negative_flag(value);
@@ -60,7 +59,7 @@ impl Cpu {
                 }
             }
             AddressingMode::AbsoluteYIndexed => {
-                let (value, page_changed) = absolute_y_read(self, bus, low_byte, high_byte);
+                let (value, page_changed) = absolute_y_read(self, low_byte, high_byte);
 
                 self.accumulator = value;
                 self.modify_negative_flag(value);
@@ -72,7 +71,7 @@ impl Cpu {
                 }
             }
             AddressingMode::IndirectXIndexed => {
-                let value = indirect_x_read(self, bus, low_byte);
+                let value = indirect_x_read(self, low_byte);
 
                 self.accumulator = value;
                 self.modify_negative_flag(value);
@@ -81,7 +80,7 @@ impl Cpu {
                 6
             }
             AddressingMode::IndirectYIndexed => {
-                let (value, page_changed) = indirect_y_read(self, bus, low_byte);
+                let (value, page_changed) = indirect_y_read(self, low_byte);
 
                 self.accumulator = value;
                 self.modify_negative_flag(value);
@@ -98,7 +97,7 @@ impl Cpu {
 
     pub(crate) fn instruction_ldx(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -114,7 +113,7 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let value = zeropage_read(self, bus, low_byte);
+                let value = zeropage_read(self, low_byte);
 
                 self.x = value;
                 self.modify_negative_flag(value);
@@ -123,7 +122,7 @@ impl Cpu {
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                let value = zeropage_x_read(self, bus, low_byte);
+                let value = zeropage_x_read(self, low_byte);
 
                 self.x = value;
                 self.modify_negative_flag(value);
@@ -132,7 +131,7 @@ impl Cpu {
                 4
             }
             AddressingMode::Absolute => {
-                let value = absolute_read(self, bus, low_byte, high_byte);
+                let value = absolute_read(self, low_byte, high_byte);
 
                 self.x = value;
                 self.modify_negative_flag(value);
@@ -141,7 +140,7 @@ impl Cpu {
                 4
             }
             AddressingMode::AbsoluteYIndexed => {
-                let (value, page_changed) = absolute_y_read(self, bus, low_byte, high_byte);
+                let (value, page_changed) = absolute_y_read(self, low_byte, high_byte);
 
                 self.x = value;
                 self.modify_negative_flag(value);
@@ -158,7 +157,7 @@ impl Cpu {
 
     pub(crate) fn instruction_ldy(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -174,7 +173,7 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let value = zeropage_read(self, bus, low_byte);
+                let value = zeropage_read(self, low_byte);
 
                 self.y = value;
                 self.modify_negative_flag(value);
@@ -183,7 +182,7 @@ impl Cpu {
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                let value = zeropage_x_read(self, bus, low_byte);
+                let value = zeropage_x_read(self, low_byte);
 
                 self.y = value;
                 self.modify_negative_flag(value);
@@ -192,7 +191,7 @@ impl Cpu {
                 4
             }
             AddressingMode::Absolute => {
-                let value = absolute_read(self, bus, low_byte, high_byte);
+                let value = absolute_read(self, low_byte, high_byte);
 
                 self.y = value;
                 self.modify_negative_flag(value);
@@ -201,7 +200,7 @@ impl Cpu {
                 4
             }
             AddressingMode::AbsoluteXIndexed => {
-                let (value, page_changed) = absolute_x_read(self, bus, low_byte, high_byte);
+                let (value, page_changed) = absolute_x_read(self, low_byte, high_byte);
 
                 self.y = value;
                 self.modify_negative_flag(value);
@@ -218,38 +217,38 @@ impl Cpu {
 
     pub(crate) fn instruction_sta(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
     ) -> u8 {
         match addressing_mode {
             AddressingMode::Zeropage => {
-                zeropage_write(self, bus, low_byte, self.accumulator);
+                zeropage_write(self, low_byte, self.accumulator);
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                zeropage_x_write(self, bus, low_byte, self.accumulator);
+                zeropage_x_write(self, low_byte, self.accumulator);
                 4
             }
             AddressingMode::Absolute => {
-                absolute_write(self, bus, low_byte, high_byte, self.accumulator);
+                absolute_write(self, low_byte, high_byte, self.accumulator);
                 4
             }
             AddressingMode::AbsoluteXIndexed => {
-                absolute_x_write(self, bus, low_byte, high_byte, self.accumulator);
+                absolute_x_write(self, low_byte, high_byte, self.accumulator);
                 5
             }
             AddressingMode::AbsoluteYIndexed => {
-                absolute_y_write(self, bus, low_byte, high_byte, self.accumulator);
+                absolute_y_write(self, low_byte, high_byte, self.accumulator);
                 5
             }
             AddressingMode::IndirectXIndexed => {
-                indirect_x_write(self, bus, low_byte, self.accumulator);
+                indirect_x_write(self, low_byte, self.accumulator);
                 6
             }
             AddressingMode::IndirectYIndexed => {
-                indirect_y_write(self, bus, low_byte, self.accumulator);
+                indirect_y_write(self, low_byte, self.accumulator);
                 6
             }
             _ => handle_invalid_addressing_mode(),
@@ -258,22 +257,22 @@ impl Cpu {
 
     pub(crate) fn instruction_stx(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
     ) -> u8 {
         match addressing_mode {
             AddressingMode::Zeropage => {
-                zeropage_write(self, bus, low_byte, self.x);
+                zeropage_write(self, low_byte, self.x);
                 3
             }
             AddressingMode::ZeropageYIndexed => {
-                zeropage_y_write(self, bus, low_byte, self.x);
+                zeropage_y_write(self, low_byte, self.x);
                 4
             }
             AddressingMode::Absolute => {
-                absolute_write(self, bus, low_byte, high_byte, self.x);
+                absolute_write(self, low_byte, high_byte, self.x);
                 4
             }
             _ => handle_invalid_addressing_mode(),
@@ -282,22 +281,22 @@ impl Cpu {
 
     pub(crate) fn instruction_sty(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
     ) -> u8 {
         match addressing_mode {
             AddressingMode::Zeropage => {
-                zeropage_write(self, bus, low_byte, self.x);
+                zeropage_write(self, low_byte, self.x);
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                zeropage_x_write(self, bus, low_byte, self.x);
+                zeropage_x_write(self, low_byte, self.x);
                 4
             }
             AddressingMode::Absolute => {
-                absolute_write(self, bus, low_byte, high_byte, self.x);
+                absolute_write(self, low_byte, high_byte, self.x);
                 4
             }
             _ => handle_invalid_addressing_mode(),

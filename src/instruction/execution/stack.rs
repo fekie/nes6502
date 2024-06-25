@@ -1,4 +1,4 @@
-use super::{AddressingMode, Bus, Cpu};
+use super::{AddressingMode, Cpu};
 use crate::ProcessorStatus;
 
 impl Cpu {
@@ -12,25 +12,25 @@ impl Cpu {
         2
     }
 
-    pub(crate) fn instruction_pha(&mut self, bus: &Bus) -> u8 {
-        self.push(bus, self.accumulator);
+    pub(crate) fn instruction_pha(&mut self) -> u8 {
+        self.push(self.accumulator);
         3
     }
 
-    pub(crate) fn instruction_php(&mut self, bus: &Bus) -> u8 {
-        self.push(bus, self.processor_status.0);
+    pub(crate) fn instruction_php(&mut self) -> u8 {
+        self.push(self.processor_status.0);
 
         3
     }
 
-    pub(crate) fn instruction_pla(&mut self, bus: &Bus) -> u8 {
-        self.accumulator = self.pop(bus);
+    pub(crate) fn instruction_pla(&mut self) -> u8 {
+        self.accumulator = self.pop();
 
         4
     }
 
-    pub(crate) fn instruction_plp(&mut self, bus: &Bus) -> u8 {
-        self.processor_status = ProcessorStatus(self.pop(bus));
+    pub(crate) fn instruction_plp(&mut self) -> u8 {
+        self.processor_status = ProcessorStatus(self.pop());
 
         4
     }

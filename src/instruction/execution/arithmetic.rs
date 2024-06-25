@@ -3,12 +3,11 @@ use super::{
     immediate_read, indirect_x_read, indirect_y_read, zeropage_read, zeropage_x_read,
 };
 use super::{AddressingMode, Cpu};
-use crate::Bus;
 
 impl Cpu {
     pub(crate) fn instruction_adc(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -21,25 +20,25 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let value = zeropage_read(self, bus, low_byte);
+                let value = zeropage_read(self, low_byte);
                 self.adc_intermediate(value);
 
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                let value = zeropage_x_read(self, bus, low_byte);
+                let value = zeropage_x_read(self, low_byte);
                 self.adc_intermediate(value);
 
                 4
             }
             AddressingMode::Absolute => {
-                let value = absolute_read(self, bus, low_byte, high_byte);
+                let value = absolute_read(self, low_byte, high_byte);
                 self.adc_intermediate(value);
 
                 4
             }
             AddressingMode::AbsoluteXIndexed => {
-                let (value, boundary_crossed) = absolute_x_read(self, bus, low_byte, high_byte);
+                let (value, boundary_crossed) = absolute_x_read(self, low_byte, high_byte);
                 self.adc_intermediate(value);
 
                 match boundary_crossed {
@@ -48,7 +47,7 @@ impl Cpu {
                 }
             }
             AddressingMode::AbsoluteYIndexed => {
-                let (value, boundary_crossed) = absolute_y_read(self, bus, low_byte, high_byte);
+                let (value, boundary_crossed) = absolute_y_read(self, low_byte, high_byte);
                 self.adc_intermediate(value);
 
                 match boundary_crossed {
@@ -57,13 +56,13 @@ impl Cpu {
                 }
             }
             AddressingMode::IndirectXIndexed => {
-                let value = indirect_x_read(self, bus, low_byte);
+                let value = indirect_x_read(self, low_byte);
                 self.adc_intermediate(value);
 
                 6
             }
             AddressingMode::IndirectYIndexed => {
-                let (value, boundary_crossed) = indirect_y_read(self, bus, low_byte);
+                let (value, boundary_crossed) = indirect_y_read(self, low_byte);
                 self.adc_intermediate(value);
 
                 match boundary_crossed {
@@ -77,7 +76,7 @@ impl Cpu {
 
     pub(crate) fn instruction_sbc(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -90,25 +89,25 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let value = zeropage_read(self, bus, low_byte);
+                let value = zeropage_read(self, low_byte);
                 self.sbc_intermediate(value);
 
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                let value = zeropage_x_read(self, bus, low_byte);
+                let value = zeropage_x_read(self, low_byte);
                 self.sbc_intermediate(value);
 
                 4
             }
             AddressingMode::Absolute => {
-                let value = absolute_read(self, bus, low_byte, high_byte);
+                let value = absolute_read(self, low_byte, high_byte);
                 self.sbc_intermediate(value);
 
                 4
             }
             AddressingMode::AbsoluteXIndexed => {
-                let (value, boundary_crossed) = absolute_x_read(self, bus, low_byte, high_byte);
+                let (value, boundary_crossed) = absolute_x_read(self, low_byte, high_byte);
                 self.sbc_intermediate(value);
 
                 match boundary_crossed {
@@ -117,7 +116,7 @@ impl Cpu {
                 }
             }
             AddressingMode::AbsoluteYIndexed => {
-                let (value, boundary_crossed) = absolute_y_read(self, bus, low_byte, high_byte);
+                let (value, boundary_crossed) = absolute_y_read(self, low_byte, high_byte);
                 self.sbc_intermediate(value);
 
                 match boundary_crossed {
@@ -126,13 +125,13 @@ impl Cpu {
                 }
             }
             AddressingMode::IndirectXIndexed => {
-                let value = indirect_x_read(self, bus, low_byte);
+                let value = indirect_x_read(self, low_byte);
                 self.sbc_intermediate(value);
 
                 6
             }
             AddressingMode::IndirectYIndexed => {
-                let (value, boundary_crossed) = indirect_y_read(self, bus, low_byte);
+                let (value, boundary_crossed) = indirect_y_read(self, low_byte);
                 self.sbc_intermediate(value);
 
                 match boundary_crossed {
@@ -146,7 +145,7 @@ impl Cpu {
 
     pub(crate) fn instruction_cmp(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -159,25 +158,25 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let value = zeropage_read(self, bus, low_byte);
+                let value = zeropage_read(self, low_byte);
                 self.cmp_intermediate(value);
 
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                let value = zeropage_x_read(self, bus, low_byte);
+                let value = zeropage_x_read(self, low_byte);
                 self.cmp_intermediate(value);
 
                 4
             }
             AddressingMode::Absolute => {
-                let value = absolute_read(self, bus, low_byte, high_byte);
+                let value = absolute_read(self, low_byte, high_byte);
                 self.cmp_intermediate(value);
 
                 4
             }
             AddressingMode::AbsoluteXIndexed => {
-                let (value, boundary_crossed) = absolute_x_read(self, bus, low_byte, high_byte);
+                let (value, boundary_crossed) = absolute_x_read(self, low_byte, high_byte);
                 self.cmp_intermediate(value);
 
                 match boundary_crossed {
@@ -186,7 +185,7 @@ impl Cpu {
                 }
             }
             AddressingMode::AbsoluteYIndexed => {
-                let (value, boundary_crossed) = absolute_y_read(self, bus, low_byte, high_byte);
+                let (value, boundary_crossed) = absolute_y_read(self, low_byte, high_byte);
                 self.cmp_intermediate(value);
 
                 match boundary_crossed {
@@ -195,13 +194,13 @@ impl Cpu {
                 }
             }
             AddressingMode::IndirectXIndexed => {
-                let value = indirect_x_read(self, bus, low_byte);
+                let value = indirect_x_read(self, low_byte);
                 self.cmp_intermediate(value);
 
                 6
             }
             AddressingMode::IndirectYIndexed => {
-                let (value, boundary_crossed) = indirect_y_read(self, bus, low_byte);
+                let (value, boundary_crossed) = indirect_y_read(self, low_byte);
                 self.cmp_intermediate(value);
 
                 match boundary_crossed {
@@ -215,7 +214,7 @@ impl Cpu {
 
     pub(crate) fn instruction_cpx(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -228,25 +227,25 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let value = zeropage_read(self, bus, low_byte);
+                let value = zeropage_read(self, low_byte);
                 self.cpx_intermediate(value);
 
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                let value = zeropage_x_read(self, bus, low_byte);
+                let value = zeropage_x_read(self, low_byte);
                 self.cpx_intermediate(value);
 
                 4
             }
             AddressingMode::Absolute => {
-                let value = absolute_read(self, bus, low_byte, high_byte);
+                let value = absolute_read(self, low_byte, high_byte);
                 self.cpx_intermediate(value);
 
                 4
             }
             AddressingMode::AbsoluteXIndexed => {
-                let (value, boundary_crossed) = absolute_x_read(self, bus, low_byte, high_byte);
+                let (value, boundary_crossed) = absolute_x_read(self, low_byte, high_byte);
                 self.cpx_intermediate(value);
 
                 match boundary_crossed {
@@ -255,7 +254,7 @@ impl Cpu {
                 }
             }
             AddressingMode::AbsoluteYIndexed => {
-                let (value, boundary_crossed) = absolute_y_read(self, bus, low_byte, high_byte);
+                let (value, boundary_crossed) = absolute_y_read(self, low_byte, high_byte);
                 self.cpx_intermediate(value);
 
                 match boundary_crossed {
@@ -264,13 +263,13 @@ impl Cpu {
                 }
             }
             AddressingMode::IndirectXIndexed => {
-                let value = indirect_x_read(self, bus, low_byte);
+                let value = indirect_x_read(self, low_byte);
                 self.cpx_intermediate(value);
 
                 6
             }
             AddressingMode::IndirectYIndexed => {
-                let (value, boundary_crossed) = indirect_y_read(self, bus, low_byte);
+                let (value, boundary_crossed) = indirect_y_read(self, low_byte);
                 self.cpx_intermediate(value);
 
                 match boundary_crossed {
@@ -284,7 +283,7 @@ impl Cpu {
 
     pub(crate) fn instruction_cpy(
         &mut self,
-        bus: &Bus,
+
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -297,25 +296,25 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                let value = zeropage_read(self, bus, low_byte);
+                let value = zeropage_read(self, low_byte);
                 self.cpy_intermediate(value);
 
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                let value = zeropage_x_read(self, bus, low_byte);
+                let value = zeropage_x_read(self, low_byte);
                 self.cpy_intermediate(value);
 
                 4
             }
             AddressingMode::Absolute => {
-                let value = absolute_read(self, bus, low_byte, high_byte);
+                let value = absolute_read(self, low_byte, high_byte);
                 self.cpy_intermediate(value);
 
                 4
             }
             AddressingMode::AbsoluteXIndexed => {
-                let (value, boundary_crossed) = absolute_x_read(self, bus, low_byte, high_byte);
+                let (value, boundary_crossed) = absolute_x_read(self, low_byte, high_byte);
                 self.cpy_intermediate(value);
 
                 match boundary_crossed {
@@ -324,7 +323,7 @@ impl Cpu {
                 }
             }
             AddressingMode::AbsoluteYIndexed => {
-                let (value, boundary_crossed) = absolute_y_read(self, bus, low_byte, high_byte);
+                let (value, boundary_crossed) = absolute_y_read(self, low_byte, high_byte);
                 self.cpy_intermediate(value);
 
                 match boundary_crossed {
@@ -333,13 +332,13 @@ impl Cpu {
                 }
             }
             AddressingMode::IndirectXIndexed => {
-                let value = indirect_x_read(self, bus, low_byte);
+                let value = indirect_x_read(self, low_byte);
                 self.cpy_intermediate(value);
 
                 6
             }
             AddressingMode::IndirectYIndexed => {
-                let (value, boundary_crossed) = indirect_y_read(self, bus, low_byte);
+                let (value, boundary_crossed) = indirect_y_read(self, low_byte);
                 self.cpy_intermediate(value);
 
                 match boundary_crossed {

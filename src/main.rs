@@ -1,5 +1,5 @@
-use crate::CPU;
+use nes6502::Cpu;
 
 pub fn main() {
-	let foo = 
+    let foo = Cpu::new();
 }
