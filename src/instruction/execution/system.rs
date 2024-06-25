@@ -1,5 +1,5 @@
+use super::Cpu;
 use super::{pack_bytes, unpack_bytes};
-use super::{AddressingMode, Cpu};
 use crate::processor_status::ProcessorStatus;
 use crate::IRQ_BRK_VECTOR_ADDRESS;
 
@@ -12,14 +12,13 @@ impl Cpu {
         self.push(pc_high);
         self.push(pc_low);
 
-        println!("{:?}", self.processor_status.0);
-
+        // break flag is only pushed to the stack
         self.processor_status.set_break_flag();
         self.push(self.processor_status.0);
         self.processor_status.clear_break_flag();
-        self.processor_status.set_interrupt_disable_flag();
 
-        println!("{:?}", self.processor_status.0);
+        // interrupt disable is set after pushing flags to stack https://www.nesdev.org/wiki/Status_flags#I:_Interrupt_Disable
+        self.processor_status.set_interrupt_disable_flag();
 
         self.program_counter = pack_bytes(
             self.read(IRQ_BRK_VECTOR_ADDRESS),
