@@ -10,7 +10,10 @@ impl Cpu {
         self.push(pc_high);
         self.push(pc_low);
 
+        dbg!(self.processor_status.0);
         self.processor_status.set_break_flag();
+
+        dbg!(self.processor_status.0);
 
         self.push(self.processor_status.0);
 

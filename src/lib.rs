@@ -31,7 +31,7 @@ pub struct Cpu {
 
 /// The state of the CPU. The `ram` field is the non-zero memory
 /// locations in [address, value]
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CpuState {
     pub pc: u16,
     pub s: u8,
@@ -43,6 +43,37 @@ pub struct CpuState {
     /// locations in [address, value] form. The value will be
     /// within a u16
     pub ram: Vec<Vec<u16>>,
+}
+
+
+
+impl PartialEq for CpuState {
+    fn eq(&self, other: &Self) -> bool {
+        let other_fields_match = (self.pc == other.pc) && (self.s == other.s) && (self.a == other.a) && (self.x == other.x) &&(self.y == other.y) && (self.p == other.p);
+
+        // Sort the ram by index. This is its normalized state
+        let self_normalized_ram = {
+            let mut cloned = self.ram.clone();
+            cloned.sort_by(|a, b| {
+                a[0].cmp(&b[0])
+            });
+            cloned.into_iter().filter(|x| {
+                x[1] != 0
+            }).collect::<Vec<Vec<u16>>>()
+        };
+
+        let other_normalized_ram = {
+            let mut cloned = other.ram.clone();
+            cloned.sort_by(|a, b| {
+                a[0].cmp(&b[0])
+            });
+            cloned.into_iter().filter(|x| {
+                x[1] != 0
+            }).collect::<Vec<Vec<u16>>>()
+        };
+
+        other_fields_match && (self_normalized_ram == other_normalized_ram)
+    }
 }
 
 impl Cpu {
@@ -62,8 +93,16 @@ impl Cpu {
         }
     }
 
-    pub fn from_state(cpu_state: &CpuState) -> Self {
-        Self {
+    pub fn from_state(mut cpu_state: CpuState) -> Self {
+        let mut memory_mapper = CpuMemoryMapper::new();
+        for chunk in &cpu_state.ram {
+            let address = chunk[0];
+            let value = chunk[1];
+
+            memory_mapper.work_ram.0[address as usize] = value as u8;
+        }
+
+        let cpu = Self {
             accumulator: cpu_state.a,
             x: cpu_state.x,
             y: cpu_state.y,
@@ -71,9 +110,14 @@ impl Cpu {
             program_counter: cpu_state.pc,
             registers: [0; 6],
             processor_status: ProcessorStatus(cpu_state.p),
-            memory_mapper: CpuMemoryMapper::new(),
+            memory_mapper,
             initialized: true,
-        }
+        };
+
+        // sanity check
+        assert_eq!(cpu.state(), cpu_state);
+
+        cpu
     }
 
     pub fn state(&self) -> CpuState {
@@ -388,6 +432,18 @@ impl CpuMemoryMapper {
         Self {
             work_ram: WorkRAM([0; 65536]),
         }
+    }
+
+    pub fn from_state(cpu_state: &CpuState) -> Self {
+        let mut work_ram = [0; 65536];
+
+        todo!()
+
+        /* for 
+
+        Self {
+            work_ram: cpu_state.ram
+        } */
     }
 }
 

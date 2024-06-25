@@ -19,14 +19,25 @@ pub enum CyclePart {
 }
 
 fn main() {
+    let current_test = r#"{ "name": "00 35 26", "initial": { "pc": 59521, "s": 242, "a": 4, "x": 71, "y": 56, "p": 97, "ram": [ [59521, 0], [59522, 53], [59523, 38], [65534, 21], [65535, 35], [8981, 229]]}, "final": { "pc": 8981, "s": 239, "a": 4, "x": 71, "y": 56, "p": 101, "ram": [ [496, 113], [497, 131], [498, 232], [8981, 229], [59521, 0], [59522, 53], [59523, 38], [65534, 21], [65535, 35]]}, "cycles": [ [59521, 0, "read"], [59522, 53, "read"], [498, 232, "write"], [497, 131, "write"], [496, 113, "write"], [65534, 21, "read"], [65535, 35, "read"]] }"#;
+    let example: Example = serde_json::from_str(current_test).unwrap();
+    let mut cpu = Cpu::from_state(example.initial_state.clone());
+    assert_eq!(cpu.state(), example.initial_state);
+    cpu.cycle();
+    let final_state = cpu.state();
+    println!("Final | Expected");
+    assert_eq!(final_state, example.final_state);
+    println!("Current test success!");
+
     let examples = load_examples();
 
     for example in examples {
-        let mut cpu = Cpu::from_state(&example.initial_state);
+        let mut cpu = Cpu::from_state(example.initial_state);
         dbg!("aaaa");
         cpu.cycle();
         let final_state = cpu.state();
-        assert_eq!(final_state, example.initial_state);
+        println!("Final | Expected");
+        assert_eq!(final_state, example.final_state);
     }
 }
 
