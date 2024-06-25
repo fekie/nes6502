@@ -4,20 +4,27 @@ use crate::processor_status::ProcessorStatus;
 use crate::IRQ_BRK_VECTOR_ADDRESS;
 
 impl Cpu {
+    // more information on BRK https://www.nesdev.org/wiki/Visual6502wiki/6502_BRK_and_B_bit
     pub(crate) fn instruction_brk(&mut self) -> u8 {
-        let (pc_low, pc_high) = unpack_bytes(self.program_counter);
+        // we skip ahead 1 byte because the byte after a BRK provides debugging information
+        let (pc_low, pc_high) = unpack_bytes(self.program_counter + 1);
 
         self.push(pc_high);
         self.push(pc_low);
 
-        dbg!(self.processor_status.0);
+        println!("{:?}", self.processor_status.0);
+
         self.processor_status.set_break_flag();
-
-        dbg!(self.processor_status.0);
-
         self.push(self.processor_status.0);
+        self.processor_status.clear_break_flag();
+        self.processor_status.set_interrupt_disable_flag();
 
-        self.program_counter = IRQ_BRK_VECTOR_ADDRESS;
+        println!("{:?}", self.processor_status.0);
+
+        self.program_counter = pack_bytes(
+            self.read(IRQ_BRK_VECTOR_ADDRESS),
+            self.read(IRQ_BRK_VECTOR_ADDRESS + 1),
+        );
 
         7
     }

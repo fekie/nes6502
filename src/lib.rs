@@ -45,6 +45,21 @@ pub struct CpuState {
     pub ram: Vec<Vec<u16>>,
 }
 
+impl CpuState {
+    // Removes zeroed memory from ram.
+    pub fn canonicalize(&mut self) {
+        self.ram = {
+            let mut cloned = self.ram.clone();
+            cloned.sort_by(|a, b| {
+                a[0].cmp(&b[0])
+            });
+            cloned.into_iter().filter(|x| {
+                x[1] != 0
+            }).collect::<Vec<Vec<u16>>>()
+        };
+    }
+}
+
 
 
 impl PartialEq for CpuState {
@@ -79,6 +94,7 @@ impl PartialEq for CpuState {
 impl Cpu {
     /// Creates a new Cpu but does not initialize it as it needs to be connected
     /// to the bus to initialize. You can initialize it with [`Self::initialize`].
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             accumulator: 0,
@@ -93,7 +109,7 @@ impl Cpu {
         }
     }
 
-    pub fn from_state(mut cpu_state: CpuState) -> Self {
+    pub fn from_state(cpu_state: CpuState) -> Self {
         let mut memory_mapper = CpuMemoryMapper::new();
         for chunk in &cpu_state.ram {
             let address = chunk[0];
