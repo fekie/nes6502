@@ -361,9 +361,6 @@ impl Cpu {
 
 // We use 2KB of work ram.
 #[derive(Debug)]
-#[cfg(not(harte))]
-pub struct WorkRAM([u8; 0x800]);
-#[cfg(harte)]
 pub struct WorkRAM([u8; 0x10000]);
 
 /// Memory Map:
@@ -389,7 +386,7 @@ pub struct CpuMemoryMapper {
 impl CpuMemoryMapper {
     pub fn new() -> Self {
         Self {
-            work_ram: WorkRAM([0; 2048]),
+            work_ram: WorkRAM([0; 65536]),
         }
     }
 }
