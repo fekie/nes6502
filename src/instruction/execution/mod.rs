@@ -31,40 +31,16 @@ impl Cpu {
         }
     }
 
-    /// Sets the overflow flag if an overflow ocurred.
-    fn modify_overflow_flag(&mut self, op1: u8, op2: u8) {
-        let op1_sign = op1 >> 7;
-        let op2_sign = op2 >> 7;
-
-        let result = op1 + op2;
-
-        // If the signs were the same and are different from the result,
-        // we have an overflow.
-        match op1_sign == op2_sign {
-            true => match op1_sign == result >> 7 {
-                true => self.processor_status.clear_overflow_flag(),
-                false => self.processor_status.set_overflow_flag(),
-            },
-            false => self.processor_status.clear_overflow_flag(),
-        }
-    }
-
-    /// Sets the carry flag if a carry out ocurred.
-    fn modify_carry_flag(&mut self, op1: u8, op2: u8) {
-        match op1.checked_add(op2).is_none() {
-            true => self.processor_status.set_carry_flag(),
-            false => self.processor_status.clear_carry_flag(),
-        }
-    }
-
     // Pushes a value from the stack
     fn push(&mut self, byte: u8) {
         self.write(0x0100 | self.stack_pointer as u16, byte);
 
-        self.stack_pointer = match self.stack_pointer.checked_sub(1) {
+        self.stack_pointer -= 1;
+
+        /* self.stack_pointer = match self.stack_pointer.checked_sub(1) {
             Some(x) => x,
             None => panic!("Cpu stack overflow"),
-        };
+        }; */
     }
 
     // Pops a value from the stack
@@ -74,9 +50,7 @@ impl Cpu {
             None => panic!("Cpu stack underflow"),
         };
 
-        let byte = self.read(0x0100 | self.stack_pointer as u16);
-
-        byte
+        self.read(0x0100 | self.stack_pointer as u16)
     }
 }
 

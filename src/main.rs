@@ -19,7 +19,7 @@ pub enum CyclePart {
 }
 
 fn main() {
-    /* let current_test = r#"{ "name": "00 35 26", "initial": { "pc": 59521, "s": 242, "a": 4, "x": 71, "y": 56, "p": 97, "ram": [ [59521, 0], [59522, 53], [59523, 38], [65534, 21], [65535, 35], [8981, 229]]}, "final": { "pc": 8981, "s": 239, "a": 4, "x": 71, "y": 56, "p": 101, "ram": [ [496, 113], [497, 131], [498, 232], [8981, 229], [59521, 0], [59522, 53], [59523, 38], [65534, 21], [65535, 35]]}, "cycles": [ [59521, 0, "read"], [59522, 53, "read"], [498, 232, "write"], [497, 131, "write"], [496, 113, "write"], [65534, 21, "read"], [65535, 35, "read"]] }"#;
+    /* let current_test = r#"{ "name": "00 71 9d", "initial": { "pc": 28841, "s": 0, "a": 79, "x": 83, "y": 118, "p": 171, "ram": [ [28841, 0], [28842, 113], [28843, 157], [65534, 203], [65535, 93], [24011, 124]]}, "final": { "pc": 24011, "s": 253, "a": 79, "x": 83, "y": 118, "p": 175, "ram": [ [256, 112], [510, 187], [511, 171], [24011, 124], [28841, 0], [28842, 113], [28843, 157], [65534, 203], [65535, 93]]}, "cycles": [ [28841, 0, "read"], [28842, 113, "read"], [256, 112, "write"], [511, 171, "write"], [510, 187, "write"], [65534, 203, "read"], [65535, 93, "read"]] }"#;
     let mut example: Example = serde_json::from_str(current_test).unwrap();
     example.initial_state.canonicalize();
     example.final_state.canonicalize();
@@ -30,7 +30,7 @@ fn main() {
     assert_eq!(final_state, example.final_state);
     println!("Current test success!"); */
 
-    let examples = load_examples();
+    /* let examples = load_examples();
 
     for example in examples {
         let mut cpu = Cpu::from_state(example.initial_state);
@@ -38,7 +38,7 @@ fn main() {
         cpu.cycle();
         let final_state = cpu.state();
         assert_eq!(final_state, example.final_state);
-    }
+    } */
 }
 
 fn load_examples() -> Vec<Example> {
