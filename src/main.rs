@@ -19,7 +19,7 @@ pub enum CyclePart {
 }
 
 fn main() {
-    /* let current_test = r#"{ "name": "10 98 49", "initial": { "pc": 41379, "s": 218, "a": 248, "x": 28, "y": 116, "p": 32, "ram": [ [41379, 16], [41380, 152], [41381, 73], [41277, 175]]}, "final": { "pc": 41277, "s": 218, "a": 248, "x": 28, "y": 116, "p": 32, "ram": [ [41277, 175], [41379, 16], [41380, 152], [41381, 73]]}, "cycles": [ [41379, 16, "read"], [41380, 152, "read"], [41381, 73, "read"]] }"#;
+    /* let current_test = r#"{ "name": "10 80 3f", "initial": { "pc": 39423, "s": 219, "a": 20, "x": 71, "y": 142, "p": 37, "ram": [ [39423, 16], [39424, 128], [39425, 63], [39553, 82], [39297, 161]]}, "final": { "pc": 39297, "s": 219, "a": 20, "x": 71, "y": 142, "p": 37, "ram": [ [39297, 161], [39423, 16], [39424, 128], [39425, 63], [39553, 82]]}, "cycles": [ [39423, 16, "read"], [39424, 128, "read"], [39425, 63, "read"], [39553, 82, "read"]] }"#;
     let mut example: Example = serde_json::from_str(current_test).unwrap();
     example.initial_state.canonicalize();
     example.final_state.canonicalize();
