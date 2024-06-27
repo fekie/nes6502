@@ -246,6 +246,10 @@ impl Cpu {
             AddressingMode::IndirectXIndexed => {
                 let value = indirect_x_read(self, low_byte) | self.accumulator;
 
+                dbg!(self.accumulator);
+                dbg!(indirect_x_read(self, low_byte));
+                dbg!(value);
+
                 self.accumulator = value;
                 self.modify_negative_flag(value);
                 self.modify_zero_flag(value);

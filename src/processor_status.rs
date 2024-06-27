@@ -41,7 +41,6 @@ impl ProcessorStatus {
     pub fn clear_zero_flag(&mut self) {
         let mask = 0b1111_1101;
         self.0 &= mask;
-        self.0 |= mask;
     }
 
     //

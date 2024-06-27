@@ -20,7 +20,7 @@ impl Cpu {
         match byte == 0 {
             true => self.processor_status.set_zero_flag(),
             false => self.processor_status.clear_zero_flag(),
-        }
+        };
     }
 
     /// Sets the negative flag given byte is negative (in two's compliment)
@@ -36,11 +36,6 @@ impl Cpu {
         self.write(0x0100 | self.stack_pointer as u16, byte);
 
         self.stack_pointer -= 1;
-
-        /* self.stack_pointer = match self.stack_pointer.checked_sub(1) {
-            Some(x) => x,
-            None => panic!("Cpu stack overflow"),
-        }; */
     }
 
     // Pops a value from the stack
@@ -111,11 +106,6 @@ fn zeropage_x_write(cpu: &mut Cpu, low_byte: Option<u8>, value: u8) {
     cpu.write(address, value);
 }
 
-fn zeropage_y_read(cpu: &Cpu, low_byte: Option<u8>) -> u8 {
-    let address = low_byte.unwrap().wrapping_add(cpu.y) as u16;
-    cpu.read(address)
-}
-
 fn zeropage_y_write(cpu: &mut Cpu, low_byte: Option<u8>, value: u8) {
     let address = low_byte.unwrap().wrapping_add(cpu.y) as u16;
     cpu.write(address, value);
@@ -164,11 +154,12 @@ fn absolute_y_write(cpu: &mut Cpu, low_byte: Option<u8>, high_byte: Option<u8>, 
 }
 
 fn indirect_x_read(cpu: &Cpu, low_byte: Option<u8>) -> u8 {
-    let base_address = low_byte.unwrap().wrapping_add(cpu.x) as u16;
+    let address_low_byte = cpu.read(low_byte.unwrap().wrapping_add(cpu.x) as u16);
+    let address_high_byte = cpu.read(low_byte.unwrap().wrapping_add(cpu.x).wrapping_add(1) as u16);
 
-    let resolved_address = pack_bytes(cpu.read(base_address), cpu.read(base_address + 1));
+    let address = ((address_high_byte as u16) << 8) | (address_low_byte as u16);
 
-    cpu.read(resolved_address)
+    cpu.read(address)
 }
 
 fn indirect_x_write(cpu: &mut Cpu, low_byte: Option<u8>, value: u8) {
