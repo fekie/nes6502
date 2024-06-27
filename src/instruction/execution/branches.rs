@@ -48,10 +48,14 @@ fn branch(cpu: &mut Cpu, low_byte: Option<u8>, needs_branch: bool) -> u8 {
     let value = twos_compliment_to_signed(low_byte.unwrap());
     let original_page = cpu.program_counter >> 8;
 
+    dbg!(value);
+
     if needs_branch {
         match value.is_positive() {
-            true => cpu.program_counter - value as u16,
-            false => cpu.program_counter - (-value) as u16,
+            true => {
+                cpu.program_counter += value as u16;
+            }
+            false => cpu.program_counter -= (-value) as u16,
         };
     }
 

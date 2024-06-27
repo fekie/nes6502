@@ -19,15 +19,19 @@ pub enum CyclePart {
 }
 
 fn main() {
-    /* let current_test = r#"{ "name": "01 d5 ad", "initial": { "pc": 27905, "s": 135, "a": 228, "x": 42, "y": 121, "p": 171, "ram": [ [27905, 1], [27906, 213], [27907, 173], [213, 122], [255, 110], [0, 192], [49262, 26]]}, "final": { "pc": 27907, "s": 135, "a": 254, "x": 42, "y": 121, "p": 169, "ram": [ [0, 192], [213, 122], [255, 110], [27905, 1], [27906, 213], [27907, 173], [49262, 26]]}, "cycles": [ [27905, 1, "read"], [27906, 213, "read"], [213, 122, "read"], [255, 110, "read"], [0, 192, "read"], [49262, 26, "read"]] }"#;
+    /* let current_test = r#"{ "name": "10 98 49", "initial": { "pc": 41379, "s": 218, "a": 248, "x": 28, "y": 116, "p": 32, "ram": [ [41379, 16], [41380, 152], [41381, 73], [41277, 175]]}, "final": { "pc": 41277, "s": 218, "a": 248, "x": 28, "y": 116, "p": 32, "ram": [ [41277, 175], [41379, 16], [41380, 152], [41381, 73]]}, "cycles": [ [41379, 16, "read"], [41380, 152, "read"], [41381, 73, "read"]] }"#;
     let mut example: Example = serde_json::from_str(current_test).unwrap();
     example.initial_state.canonicalize();
     example.final_state.canonicalize();
     let mut cpu = Cpu::from_state(example.initial_state.clone());
-    cpu.cycle_debug();
+    let (_, success, instruction) = cpu.cycle_debug();
+
     let final_state = cpu.state();
     println!("Final | Expected");
-    assert_eq!(final_state, example.final_state);
+    if final_state != example.final_state {
+        dbg!(instruction.unwrap());
+        assert_eq!(final_state, example.final_state);
+    }
     println!("Current test success!"); */
 
     let examples = load_examples();
@@ -54,7 +58,7 @@ fn load_examples() -> Vec<Example> {
     let mut all_examples = Vec::new();
 
     for (i, file) in std::fs::read_dir("65x02/nes6502/v1").unwrap().enumerate() {
-        if i > 10 {
+        if !(0..20).contains(&i) {
             continue;
         }
 
