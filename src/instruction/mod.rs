@@ -127,7 +127,8 @@ pub struct Instruction {
 }
 
 impl FullOpcode {
-    pub fn new(byte: u8) -> FullOpcode {
+    // Returning None means that we tried to parse an illegal instruction
+    pub fn try_new(byte: u8) -> Option<FullOpcode> {
         let low_nibble = byte & 0b0000_1111;
         let high_nibble = byte >> 4;
 
@@ -135,26 +136,26 @@ impl FullOpcode {
             0x0 => low_nibble_0(high_nibble),
             0x1 => low_nibble_1(high_nibble),
             0x2 => low_nibble_2(high_nibble),
-            0x3 => low_nibble_3(high_nibble),
+            0x3 => None,
             0x4 => low_nibble_4(high_nibble),
             0x5 => low_nibble_5(high_nibble),
             0x6 => low_nibble_6(high_nibble),
-            0x7 => low_nibble_7(high_nibble),
+            0x7 => None,
             0x8 => low_nibble_8(high_nibble),
             0x9 => low_nibble_9(high_nibble),
             0xA => low_nibble_a(high_nibble),
-            0xB => low_nibble_b(high_nibble),
+            0xB => None,
             0xC => low_nibble_c(high_nibble),
             0xD => low_nibble_d(high_nibble),
             0xE => low_nibble_e(high_nibble),
-            0xF => low_nibble_f(high_nibble),
+            0xF => None,
             _ => unreachable!(),
         }
     }
 }
 
-fn low_nibble_0(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
+fn low_nibble_0(high_nibble: u8) -> Option<FullOpcode> {
+    Some(match high_nibble {
         0x0 => FullOpcode {
             opcode: Opcode::BRK,
             addressing_mode: AddressingMode::Implied,
@@ -187,7 +188,7 @@ fn low_nibble_0(high_nibble: u8) -> FullOpcode {
             opcode: Opcode::BVS,
             addressing_mode: AddressingMode::Relative,
         },
-        0x8 => panic!(),
+        0x8 => return None,
         0x9 => FullOpcode {
             opcode: Opcode::BCC,
             addressing_mode: AddressingMode::Relative,
@@ -217,11 +218,11 @@ fn low_nibble_0(high_nibble: u8) -> FullOpcode {
             addressing_mode: AddressingMode::Relative,
         },
         _ => unreachable!(),
-    }
+    })
 }
 
-fn low_nibble_1(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
+fn low_nibble_1(high_nibble: u8) -> Option<FullOpcode> {
+    Some(match high_nibble {
         0x0 => FullOpcode {
             opcode: Opcode::ORA,
             addressing_mode: AddressingMode::IndirectXIndexed,
@@ -287,69 +288,33 @@ fn low_nibble_1(high_nibble: u8) -> FullOpcode {
             addressing_mode: AddressingMode::IndirectYIndexed,
         },
         _ => unreachable!(),
-    }
+    })
 }
 
-fn low_nibble_2(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
-        0x0 => panic!("Illegal instruction"),
-        0x1 => panic!("Illegal instruction"),
-        0x2 => panic!("Illegal instruction"),
-        0x3 => panic!("Illegal instruction"),
-        0x4 => panic!("Illegal instruction"),
-        0x5 => panic!("Illegal instruction"),
-        0x6 => panic!("Illegal instruction"),
-        0x7 => panic!("Illegal instruction"),
-        0x8 => panic!("Illegal instruction"),
-        0x9 => panic!("Illegal instruction"),
+fn low_nibble_2(high_nibble: u8) -> Option<FullOpcode> {
+    Some(match high_nibble {
+        0x0..=0x9 => return None,
         0xA => FullOpcode {
             opcode: Opcode::LDX,
             addressing_mode: AddressingMode::Immediate,
         },
-        0xB => panic!("Illegal instruction"),
-        0xC => panic!("Illegal instruction"),
-        0xD => panic!("Illegal instruction"),
-        0xE => panic!("Illegal instruction"),
-        0xF => panic!("Illegal instruction"),
+        0xB..=0xF => return None,
         _ => unreachable!(),
-    }
+    })
 }
 
-fn low_nibble_3(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
-        0x0 => panic!("Illegal instruction"),
-        0x1 => panic!("Illegal instruction"),
-        0x2 => panic!("Illegal instruction"),
-        0x3 => panic!("Illegal instruction"),
-        0x4 => panic!("Illegal instruction"),
-        0x5 => panic!("Illegal instruction"),
-        0x6 => panic!("Illegal instruction"),
-        0x7 => panic!("Illegal instruction"),
-        0x8 => panic!("Illegal instruction"),
-        0x9 => panic!("Illegal instruction"),
-        0xA => panic!("Illegal instruction"),
-        0xB => panic!("Illegal instruction"),
-        0xC => panic!("Illegal instruction"),
-        0xD => panic!("Illegal instruction"),
-        0xE => panic!("Illegal instruction"),
-        0xF => panic!("Illegal instruction"),
-        _ => unreachable!(),
-    }
-}
-
-fn low_nibble_4(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
-        0x0 => panic!("Illegal instruction"),
-        0x1 => panic!("Illegal instruction"),
+fn low_nibble_4(high_nibble: u8) -> Option<FullOpcode> {
+    Some(match high_nibble {
+        0x0..=0x1 => return None,
         0x2 => FullOpcode {
             opcode: Opcode::BIT,
             addressing_mode: AddressingMode::Zeropage,
         },
-        0x3 => panic!("Illegal instruction"),
-        0x4 => panic!("Illegal instruction"),
-        0x5 => panic!("Illegal instruction"),
-        0x6 => panic!("Illegal instruction"),
-        0x7 => panic!("Illegal instruction"),
+        0x3 => return None,
+        0x4 => return None,
+        0x5 => return None,
+        0x6 => return None,
+        0x7 => return None,
         0x8 => FullOpcode {
             opcode: Opcode::STY,
             addressing_mode: AddressingMode::Zeropage,
@@ -370,18 +335,18 @@ fn low_nibble_4(high_nibble: u8) -> FullOpcode {
             opcode: Opcode::CPY,
             addressing_mode: AddressingMode::Zeropage,
         },
-        0xD => panic!("Illegal instruction"),
+        0xD => return None,
         0xE => FullOpcode {
             opcode: Opcode::CPX,
             addressing_mode: AddressingMode::Zeropage,
         },
-        0xF => panic!("Illegal instruction"),
+        0xF => return None,
         _ => unreachable!(),
-    }
+    })
 }
 
-fn low_nibble_5(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
+fn low_nibble_5(high_nibble: u8) -> Option<FullOpcode> {
+    Some(match high_nibble {
         0x0 => FullOpcode {
             opcode: Opcode::ORA,
             addressing_mode: AddressingMode::Zeropage,
@@ -447,11 +412,11 @@ fn low_nibble_5(high_nibble: u8) -> FullOpcode {
             addressing_mode: AddressingMode::ZeropageXIndexed,
         },
         _ => unreachable!(),
-    }
+    })
 }
 
-fn low_nibble_6(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
+fn low_nibble_6(high_nibble: u8) -> Option<FullOpcode> {
+    Some(match high_nibble {
         0x0 => FullOpcode {
             opcode: Opcode::ASL,
             addressing_mode: AddressingMode::Zeropage,
@@ -517,33 +482,11 @@ fn low_nibble_6(high_nibble: u8) -> FullOpcode {
             addressing_mode: AddressingMode::ZeropageXIndexed,
         },
         _ => unreachable!(),
-    }
+    })
 }
 
-fn low_nibble_7(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
-        0x0 => panic!("Illegal instruction"),
-        0x1 => panic!("Illegal instruction"),
-        0x2 => panic!("Illegal instruction"),
-        0x3 => panic!("Illegal instruction"),
-        0x4 => panic!("Illegal instruction"),
-        0x5 => panic!("Illegal instruction"),
-        0x6 => panic!("Illegal instruction"),
-        0x7 => panic!("Illegal instruction"),
-        0x8 => panic!("Illegal instruction"),
-        0x9 => panic!("Illegal instruction"),
-        0xA => panic!("Illegal instruction"),
-        0xB => panic!("Illegal instruction"),
-        0xC => panic!("Illegal instruction"),
-        0xD => panic!("Illegal instruction"),
-        0xE => panic!("Illegal instruction"),
-        0xF => panic!("Illegal instruction"),
-        _ => unreachable!(),
-    }
-}
-
-fn low_nibble_8(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
+fn low_nibble_8(high_nibble: u8) -> Option<FullOpcode> {
+    Some(match high_nibble {
         0x0 => FullOpcode {
             opcode: Opcode::PHP,
             addressing_mode: AddressingMode::Implied,
@@ -609,11 +552,11 @@ fn low_nibble_8(high_nibble: u8) -> FullOpcode {
             addressing_mode: AddressingMode::Implied,
         },
         _ => unreachable!(),
-    }
+    })
 }
 
-fn low_nibble_9(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
+fn low_nibble_9(high_nibble: u8) -> Option<FullOpcode> {
+    Some(match high_nibble {
         0x0 => FullOpcode {
             opcode: Opcode::ORA,
             addressing_mode: AddressingMode::Immediate,
@@ -646,7 +589,7 @@ fn low_nibble_9(high_nibble: u8) -> FullOpcode {
             opcode: Opcode::ADC,
             addressing_mode: AddressingMode::AbsoluteYIndexed,
         },
-        0x8 => panic!("Illegal instruction"),
+        0x8 => return None,
         0x9 => FullOpcode {
             opcode: Opcode::STA,
             addressing_mode: AddressingMode::AbsoluteYIndexed,
@@ -676,31 +619,31 @@ fn low_nibble_9(high_nibble: u8) -> FullOpcode {
             addressing_mode: AddressingMode::AbsoluteYIndexed,
         },
         _ => unreachable!(),
-    }
+    })
 }
 
-fn low_nibble_a(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
+fn low_nibble_a(high_nibble: u8) -> Option<FullOpcode> {
+    Some(match high_nibble {
         0x0 => FullOpcode {
             opcode: Opcode::ASL,
-            addressing_mode: AddressingMode::Implied,
+            addressing_mode: AddressingMode::Accumulator,
         },
-        0x1 => panic!("Illegal instruction"),
+        0x1 => return None,
         0x2 => FullOpcode {
             opcode: Opcode::ROL,
-            addressing_mode: AddressingMode::Implied,
+            addressing_mode: AddressingMode::Accumulator,
         },
-        0x3 => panic!("Illegal instruction"),
+        0x3 => return None,
         0x4 => FullOpcode {
             opcode: Opcode::LSR,
-            addressing_mode: AddressingMode::Implied,
+            addressing_mode: AddressingMode::Accumulator,
         },
-        0x5 => panic!("Illegal instruction"),
+        0x5 => return None,
         0x6 => FullOpcode {
             opcode: Opcode::ROR,
-            addressing_mode: AddressingMode::Implied,
+            addressing_mode: AddressingMode::Accumulator,
         },
-        0x7 => panic!("Illegal instruction"),
+        0x7 => return None,
         0x8 => FullOpcode {
             opcode: Opcode::TXA,
             addressing_mode: AddressingMode::Implied,
@@ -721,62 +664,40 @@ fn low_nibble_a(high_nibble: u8) -> FullOpcode {
             opcode: Opcode::DEX,
             addressing_mode: AddressingMode::Implied,
         },
-        0xD => panic!("Illegal instruction"),
+        0xD => return None,
         0xE => FullOpcode {
             opcode: Opcode::NOP,
             addressing_mode: AddressingMode::Implied,
         },
-        0xF => panic!("Illegal instruction"),
+        0xF => return None,
         _ => unreachable!(),
-    }
+    })
 }
 
-fn low_nibble_b(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
-        0x0 => panic!("Illegal instruction"),
-        0x1 => panic!("Illegal instruction"),
-        0x2 => panic!("Illegal instruction"),
-        0x3 => panic!("Illegal instruction"),
-        0x4 => panic!("Illegal instruction"),
-        0x5 => panic!("Illegal instruction"),
-        0x6 => panic!("Illegal instruction"),
-        0x7 => panic!("Illegal instruction"),
-        0x8 => panic!("Illegal instruction"),
-        0x9 => panic!("Illegal instruction"),
-        0xA => panic!("Illegal instruction"),
-        0xB => panic!("Illegal instruction"),
-        0xC => panic!("Illegal instruction"),
-        0xD => panic!("Illegal instruction"),
-        0xE => panic!("Illegal instruction"),
-        0xF => panic!("Illegal instruction"),
-        _ => unreachable!(),
-    }
-}
-
-fn low_nibble_c(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
-        0x0 => panic!("Illegal instruction"),
-        0x1 => panic!("Illegal instruction"),
+fn low_nibble_c(high_nibble: u8) -> Option<FullOpcode> {
+    Some(match high_nibble {
+        0x0 => return None,
+        0x1 => return None,
         0x2 => FullOpcode {
             opcode: Opcode::BIT,
             addressing_mode: AddressingMode::Absolute,
         },
-        0x3 => panic!("Illegal instruction"),
+        0x3 => return None,
         0x4 => FullOpcode {
             opcode: Opcode::JMP,
             addressing_mode: AddressingMode::Absolute,
         },
-        0x5 => panic!("Illegal instruction"),
+        0x5 => return None,
         0x6 => FullOpcode {
             opcode: Opcode::JMP,
             addressing_mode: AddressingMode::Indirect,
         },
-        0x7 => panic!("Illegal instruction"),
+        0x7 => return None,
         0x8 => FullOpcode {
             opcode: Opcode::STY,
             addressing_mode: AddressingMode::Absolute,
         },
-        0x9 => panic!("Illegal instruction"),
+        0x9 => return None,
         0xA => FullOpcode {
             opcode: Opcode::LDY,
             addressing_mode: AddressingMode::Absolute,
@@ -789,18 +710,18 @@ fn low_nibble_c(high_nibble: u8) -> FullOpcode {
             opcode: Opcode::CPY,
             addressing_mode: AddressingMode::Absolute,
         },
-        0xD => panic!("Illegal instruction"),
+        0xD => return None,
         0xE => FullOpcode {
             opcode: Opcode::CPX,
             addressing_mode: AddressingMode::Absolute,
         },
-        0xF => panic!("Illegal instruction"),
+        0xF => return None,
         _ => unreachable!(),
-    }
+    })
 }
 
-fn low_nibble_d(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
+fn low_nibble_d(high_nibble: u8) -> Option<FullOpcode> {
+    Some(match high_nibble {
         0x0 => FullOpcode {
             opcode: Opcode::ORA,
             addressing_mode: AddressingMode::Absolute,
@@ -866,10 +787,10 @@ fn low_nibble_d(high_nibble: u8) -> FullOpcode {
             addressing_mode: AddressingMode::AbsoluteXIndexed,
         },
         _ => unreachable!(),
-    }
+    })
 }
-fn low_nibble_e(high_nibble: u8) -> FullOpcode {
-    match high_nibble {
+fn low_nibble_e(high_nibble: u8) -> Option<FullOpcode> {
+    Some(match high_nibble {
         0x0 => FullOpcode {
             opcode: Opcode::ASL,
             addressing_mode: AddressingMode::Absolute,
@@ -906,7 +827,7 @@ fn low_nibble_e(high_nibble: u8) -> FullOpcode {
             opcode: Opcode::STX,
             addressing_mode: AddressingMode::Absolute,
         },
-        0x9 => panic!("Illegal instruction"),
+        0x9 => return None,
         0xA => FullOpcode {
             opcode: Opcode::LDX,
             addressing_mode: AddressingMode::Absolute,
@@ -932,27 +853,27 @@ fn low_nibble_e(high_nibble: u8) -> FullOpcode {
             addressing_mode: AddressingMode::AbsoluteXIndexed,
         },
         _ => unreachable!(),
-    }
+    })
 }
 
-fn low_nibble_f(high_nibble: u8) -> FullOpcode {
+fn low_nibble_f(high_nibble: u8) -> Option<FullOpcode> {
     match high_nibble {
-        0x0 => panic!("Illegal instruction"),
-        0x1 => panic!("Illegal instruction"),
-        0x2 => panic!("Illegal instruction"),
-        0x3 => panic!("Illegal instruction"),
-        0x4 => panic!("Illegal instruction"),
-        0x5 => panic!("Illegal instruction"),
-        0x6 => panic!("Illegal instruction"),
-        0x7 => panic!("Illegal instruction"),
-        0x8 => panic!("Illegal instruction"),
-        0x9 => panic!("Illegal instruction"),
-        0xA => panic!("Illegal instruction"),
-        0xB => panic!("Illegal instruction"),
-        0xC => panic!("Illegal instruction"),
-        0xD => panic!("Illegal instruction"),
-        0xE => panic!("Illegal instruction"),
-        0xF => panic!("Illegal instruction"),
+        0x0 => return None,
+        0x1 => return None,
+        0x2 => return None,
+        0x3 => return None,
+        0x4 => return None,
+        0x5 => return None,
+        0x6 => return None,
+        0x7 => return None,
+        0x8 => return None,
+        0x9 => return None,
+        0xA => return None,
+        0xB => return None,
+        0xC => return None,
+        0xD => return None,
+        0xE => return None,
+        0xF => return None,
         _ => unreachable!(),
     }
 }

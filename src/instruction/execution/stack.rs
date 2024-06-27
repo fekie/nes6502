@@ -18,7 +18,9 @@ impl Cpu {
     }
 
     pub(crate) fn instruction_php(&mut self) -> u8 {
+        self.processor_status.set_break_flag();
         self.push(self.processor_status.0);
+        self.processor_status.clear_break_flag();
 
         3
     }

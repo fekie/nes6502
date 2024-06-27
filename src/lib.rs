@@ -194,16 +194,35 @@ impl Cpu {
 
         } */
         // fetch
-        let instruction = self.fetch();
-        self.pretty_print_cpu_state(instruction);
+        let instruction = self.fetch().unwrap();
+        //self.pretty_print_cpu_state(instruction);
+
+        
 
         // execute
         self.execute(instruction)
     }
 
+    // returns true on the second return value if instruction was executed successfully
+    pub fn cycle_debug(&mut self) -> (u8, bool, Option<Instruction>) {
+        let instruction = match self.fetch() {
+            Some(x) => x,
+            None => return (0, false, None),
+        };
+        //self.pretty_print_cpu_state(instruction);
+
+        // todo: make it so we have a flag to let us skip illegal instructions
+
+        // execute
+        (self.execute(instruction), true, Some(instruction))
+    }
+
     /// Fetches the next instruction and updates the program counter.
-    pub fn fetch(&mut self) -> Instruction {
-        let full_opcode = FullOpcode::new(self.memory_mapper.read(self.program_counter));
+    pub fn fetch(&mut self) -> Option<Instruction> {
+        let full_opcode = match FullOpcode::try_new(self.memory_mapper.read(self.program_counter)) {
+            Some(x) => x,
+            None => return None
+        };
 
         let bytes_required = full_opcode.addressing_mode.bytes_required();
 
@@ -224,12 +243,12 @@ impl Cpu {
         // Decide how much we need to increment the PC
         self.program_counter += bytes_required;
 
-        Instruction {
-            opcode: full_opcode.opcode,
-            addressing_mode: full_opcode.addressing_mode,
-            low_byte,
-            high_byte,
-        }
+        Some(Instruction {
+                    opcode: full_opcode.opcode,
+                    addressing_mode: full_opcode.addressing_mode,
+                    low_byte,
+                    high_byte,
+                })
     }
 
     /// Executes the instruction and returns the amount of machine cycles that it took.
