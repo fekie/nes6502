@@ -101,7 +101,6 @@ impl Cpu {
 
     pub(crate) fn instruction_lsr(
         &mut self,
-
         addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
@@ -115,15 +114,16 @@ impl Cpu {
 
                 self.accumulator >>= 1;
 
-                // Bit 7 will always be 0 after a shift
-                self.processor_status.clear_carry_flag();
+                self.modify_negative_flag(self.accumulator);
                 self.modify_zero_flag(self.accumulator);
 
                 2
             }
             AddressingMode::Zeropage => {
+                dbg!(self.processor_status.0);
                 let mut value = zeropage_read(self, low_byte);
 
+                dbg!(value);
                 match (value & 0b0000_0001) != 0 {
                     true => self.processor_status.set_carry_flag(),
                     false => self.processor_status.clear_carry_flag(),
@@ -131,8 +131,7 @@ impl Cpu {
 
                 value >>= 1;
 
-                // Bit 7 will always be 0 after a shift
-                self.processor_status.clear_carry_flag();
+                self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
 
                 zeropage_write(self, low_byte, value);
@@ -149,8 +148,7 @@ impl Cpu {
 
                 value >>= 1;
 
-                // Bit 7 will always be 0 after a shift
-                self.processor_status.clear_carry_flag();
+                self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
 
                 zeropage_x_write(self, low_byte, value);
@@ -167,8 +165,7 @@ impl Cpu {
 
                 value >>= 1;
 
-                // Bit 7 will always be 0 after a shift
-                self.processor_status.clear_carry_flag();
+                self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
 
                 absolute_write(self, low_byte, high_byte, value);
@@ -185,8 +182,7 @@ impl Cpu {
 
                 value >>= 1;
 
-                // Bit 7 will always be 0 after a shift
-                self.processor_status.clear_carry_flag();
+                self.modify_negative_flag(value);
                 self.modify_zero_flag(value);
 
                 absolute_x_write(self, low_byte, high_byte, value);
@@ -242,7 +238,7 @@ impl Cpu {
                 5
             }
             AddressingMode::ZeropageXIndexed => {
-                let mut value = zeropage_read(self, low_byte);
+                let mut value = zeropage_x_read(self, low_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 
@@ -262,7 +258,7 @@ impl Cpu {
                 6
             }
             AddressingMode::Absolute => {
-                let mut value = zeropage_read(self, low_byte);
+                let mut value = absolute_read(self, low_byte, high_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 
@@ -282,7 +278,7 @@ impl Cpu {
                 6
             }
             AddressingMode::AbsoluteXIndexed => {
-                let mut value = zeropage_read(self, low_byte);
+                let (mut value, _) = absolute_x_read(self, low_byte, high_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 
@@ -352,7 +348,7 @@ impl Cpu {
                 5
             }
             AddressingMode::ZeropageXIndexed => {
-                let mut value = zeropage_read(self, low_byte);
+                let mut value = zeropage_x_read(self, low_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 
@@ -373,7 +369,7 @@ impl Cpu {
                 6
             }
             AddressingMode::Absolute => {
-                let mut value = zeropage_read(self, low_byte);
+                let mut value = absolute_read(self, low_byte, high_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 
@@ -394,7 +390,7 @@ impl Cpu {
                 6
             }
             AddressingMode::AbsoluteXIndexed => {
-                let mut value = zeropage_read(self, low_byte);
+                let (mut value, _) = absolute_x_read(self, low_byte, high_byte);
 
                 let old_carry_flag = self.processor_status.carry_flag();
 

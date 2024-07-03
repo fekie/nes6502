@@ -32,7 +32,9 @@ impl Cpu {
     }
 
     pub(crate) fn instruction_plp(&mut self) -> u8 {
-        self.processor_status = ProcessorStatus(self.pop());
+        // ignore break flag and bit 5
+        let original_flags = self.processor_status.0 & 0b0011_0000;
+        self.processor_status = ProcessorStatus((self.pop() & 0b1100_1111) | original_flags);
 
         4
     }

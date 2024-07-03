@@ -40,10 +40,7 @@ impl Cpu {
 
     // Pops a value from the stack
     fn pop(&mut self) -> u8 {
-        self.stack_pointer = match self.stack_pointer.checked_add(1) {
-            Some(x) => x,
-            None => panic!("Cpu stack underflow"),
-        };
+        self.stack_pointer += 1;
 
         self.read(0x0100 | self.stack_pointer as u16)
     }

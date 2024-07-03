@@ -19,7 +19,7 @@ pub enum CyclePart {
 }
 
 fn main() {
-    /* let current_test = r#"{ "name": "10 80 3f", "initial": { "pc": 39423, "s": 219, "a": 20, "x": 71, "y": 142, "p": 37, "ram": [ [39423, 16], [39424, 128], [39425, 63], [39553, 82], [39297, 161]]}, "final": { "pc": 39297, "s": 219, "a": 20, "x": 71, "y": 142, "p": 37, "ram": [ [39297, 161], [39423, 16], [39424, 128], [39425, 63], [39553, 82]]}, "cycles": [ [39423, 16, "read"], [39424, 128, "read"], [39425, 63, "read"], [39553, 82, "read"]] }"#;
+    let current_test = r#"{ "name": "46 13 c2", "initial": { "pc": 4179, "s": 218, "a": 129, "x": 146, "y": 45, "p": 230, "ram": [ [4179, 70], [4180, 19], [4181, 194], [19, 87]]}, "final": { "pc": 4181, "s": 218, "a": 129, "x": 146, "y": 45, "p": 101, "ram": [ [19, 43], [4179, 70], [4180, 19], [4181, 194]]}, "cycles": [ [4179, 70, "read"], [4180, 19, "read"], [19, 87, "read"], [19, 87, "write"], [19, 43, "write"]] }"#;
     let mut example: Example = serde_json::from_str(current_test).unwrap();
     example.initial_state.canonicalize();
     example.final_state.canonicalize();
@@ -32,9 +32,9 @@ fn main() {
         dbg!(instruction.unwrap());
         assert_eq!(final_state, example.final_state);
     }
-    println!("Current test success!"); */
+    println!("Current test success!");
 
-    let examples = load_examples();
+    /* let examples = load_examples();
 
     for example in examples {
         let mut cpu = Cpu::from_state(example.initial_state);
@@ -50,7 +50,7 @@ fn main() {
             dbg!(instruction.unwrap());
             assert_eq!(final_state, example.final_state);
         }
-    }
+    } */
 }
 
 fn load_examples() -> Vec<Example> {
@@ -58,7 +58,7 @@ fn load_examples() -> Vec<Example> {
     let mut all_examples = Vec::new();
 
     for (i, file) in std::fs::read_dir("65x02/nes6502/v1").unwrap().enumerate() {
-        if !(0..20).contains(&i) {
+        if !(70..100).contains(&i) {
             continue;
         }
 

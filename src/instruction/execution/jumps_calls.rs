@@ -30,7 +30,7 @@ impl Cpu {
     pub(crate) fn instruction_jsr(&mut self, low_byte: Option<u8>, high_byte: Option<u8>) -> u8 {
         let subroutine_address = pack_bytes_wrapped(low_byte, high_byte);
 
-        let (pc_low, pc_high) = unpack_bytes(self.program_counter);
+        let (pc_low, pc_high) = unpack_bytes(self.program_counter - 1);
 
         self.push(pc_high);
         self.push(pc_low);
