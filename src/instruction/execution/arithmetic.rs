@@ -1,3 +1,5 @@
+use crate::instruction::execution::twos_compliment_to_signed;
+
 use super::{
     absolute_read, absolute_x_read, absolute_y_read, handle_invalid_addressing_mode,
     immediate_read, indirect_x_read, indirect_y_read, zeropage_read, zeropage_x_read,
@@ -397,41 +399,73 @@ impl Cpu {
 
     /// The intermediate code for SBC. Modifies the accumulator inside this method.
     fn sbc_intermediate(&mut self, value: u8) {
-        // If the sign bits are the same, then we need to check if they
-        // are different later because that is an overflow.
-        // If the sign bits are the same, we keep the sign in Some(), otherwise
-        // it is None and we don't need to check for overflow
-        let shared_sign = match (self.accumulator >> 7) == (value >> 7) {
+        // adjust because we're subtracting,
+        // this is the shared sign if we are comparing (a) and (-v)
+        let adjusted_shared_sign = match (self.accumulator >> 7) != (value >> 7) {
             true => Some(self.accumulator >> 7),
             false => None,
         };
 
+        dbg!(self.accumulator);
+        dbg!(value);
         // store whether we need a carry before modifying the values
-        let carry_needed =
-            (value as u16 + self.accumulator as u16 + self.processor_status.carry_flag() as u16)
-                > 255;
+        /* let carry_needed = (twos_compliment_to_signed(self.accumulator) as i16
+                   - twos_compliment_to_signed(value) as i16
+                   - (1 - self.processor_status.carry_flag() as i16))
+                   < 0;
+               dbg!(carry_needed);
+        */
 
-        self.accumulator = self.accumulator.wrapping_add(value);
+        dbg!(twos_compliment_to_signed(self.accumulator));
+        dbg!(twos_compliment_to_signed(value));
+        let should_be_negative = (twos_compliment_to_signed(self.accumulator) as i16
+            - twos_compliment_to_signed(value) as i16
+            - (1 - self.processor_status.carry_flag() as i16))
+            .is_negative();
+
+        self.accumulator = self.accumulator.wrapping_sub(value);
         self.accumulator = self
             .accumulator
-            .wrapping_add(self.processor_status.carry_flag() as u8);
+            .wrapping_sub(1 - self.processor_status.carry_flag() as u8);
 
         // Modify the carry flag
-        match carry_needed {
+        /* match carry_needed {
             true => self.processor_status.set_carry_flag(),
             false => self.processor_status.clear_carry_flag(),
-        };
+        }; */
+
+        dbg!(should_be_negative);
+        dbg!(self.accumulator);
+
+        // -78 - -32
+        dbg!(should_be_negative as u8 == (self.accumulator >> 7));
+
+        // this is true if the sign is correct
+        match should_be_negative as u8 == (self.accumulator >> 7) {
+            true => {
+                self.processor_status.clear_overflow_flag();
+                self.processor_status.clear_carry_flag();
+            }
+            false => {
+                self.processor_status.set_overflow_flag();
+                self.processor_status.set_carry_flag();
+            }
+        }
 
         // Modify the overflow flag
         // If the signs were the same before the operation, they need to
         // have the same sign as the result
-        match shared_sign {
+        /* match adjusted_shared_sign {
             Some(x) => match (self.accumulator >> 7) == (x) {
                 true => self.processor_status.clear_overflow_flag(),
-                false => self.processor_status.set_overflow_flag(),
+                false => {
+                    // if overflow occurs then carry bit is clear
+                    self.processor_status.set_overflow_flag();
+                    self.processor_status.clear_carry_flag();
+                }
             },
             None => self.processor_status.clear_overflow_flag(),
-        }
+        } */
 
         // Modify zero and negative flag
         self.modify_zero_flag(self.accumulator);
