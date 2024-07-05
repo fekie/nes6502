@@ -18,8 +18,16 @@ impl Cpu {
                 // We do an indrect read here. We do not have a general function
                 // as JMP is the only instruction that uses it
                 let base_address = pack_bytes_wrapped(low_byte, high_byte);
-                self.program_counter =
-                    pack_bytes(self.read(base_address), self.read(base_address + 1));
+
+                // check for the bug referenced here https://www.nesdev.org/obelisk-6502-guide/reference.html#JMP
+                self.program_counter = match (base_address & 0xFF) == 0xFF {
+                    true => {
+                        let lsb = self.read(base_address);
+                        let msb = self.read(base_address - 0xFF);
+                        pack_bytes(lsb, msb)
+                    }
+                    false => pack_bytes(self.read(base_address), self.read(base_address + 1)),
+                };
 
                 5
             }
@@ -44,7 +52,7 @@ impl Cpu {
         let pc_low = self.pop();
         let pc_high: u8 = self.pop();
 
-        self.program_counter = pack_bytes(pc_low, pc_high);
+        self.program_counter = pack_bytes(pc_low, pc_high) + 1;
 
         6
     }

@@ -27,6 +27,8 @@ impl Cpu {
 
     pub(crate) fn instruction_pla(&mut self) -> u8 {
         self.accumulator = self.pop();
+        self.modify_zero_flag(self.accumulator);
+        self.modify_negative_flag(self.accumulator);
 
         4
     }

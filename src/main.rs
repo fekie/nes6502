@@ -21,7 +21,7 @@ pub enum CyclePart {
 }
 
 fn main() {
-    /* let current_test = r#"{ "name": "58 aa 12", "initial": { "pc": 12360, "s": 147, "a": 15, "x": 154, "y": 104, "p": 34, "ram": [ [12360, 88], [12361, 170], [12362, 18]]}, "final": { "pc": 12361, "s": 147, "a": 15, "x": 154, "y": 104, "p": 34, "ram": [ [12360, 88], [12361, 170], [12362, 18]]}, "cycles": [ [12360, 88, "read"], [12361, 170, "read"]] }"#;
+    /* let current_test = r#"{ "name": "60 8d 97", "initial": { "pc": 52705, "s": 245, "a": 80, "x": 138, "y": 4, "p": 239, "ram": [ [52705, 96], [52706, 141], [52707, 151], [501, 184], [502, 199], [503, 217], [55751, 188], [55752, 144]]}, "final": { "pc": 55752, "s": 247, "a": 80, "x": 138, "y": 4, "p": 239, "ram": [ [501, 184], [502, 199], [503, 217], [52705, 96], [52706, 141], [52707, 151], [55751, 188], [55752, 144]]}, "cycles": [ [52705, 96, "read"], [52706, 141, "read"], [501, 184, "read"], [502, 199, "read"], [503, 217, "read"], [55751, 188, "read"]] }"#;
     let mut example: Example = serde_json::from_str(current_test).unwrap();
     example.initial_state.canonicalize();
     example.final_state.canonicalize();
@@ -60,7 +60,7 @@ fn load_examples() -> Vec<Example> {
     let mut all_examples = Vec::new();
 
     for (i, file) in std::fs::read_dir("65x02/nes6502/v1").unwrap().enumerate() {
-        if !(90..100).contains(&i) {
+        if !(108..110).contains(&i) {
             continue;
         }
 

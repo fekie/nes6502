@@ -120,10 +120,8 @@ impl Cpu {
                 2
             }
             AddressingMode::Zeropage => {
-                dbg!(self.processor_status.0);
                 let mut value = zeropage_read(self, low_byte);
 
-                dbg!(value);
                 match (value & 0b0000_0001) != 0 {
                     true => self.processor_status.set_carry_flag(),
                     false => self.processor_status.clear_carry_flag(),
@@ -320,9 +318,8 @@ impl Cpu {
                 self.accumulator >>= 1;
                 self.accumulator |= (old_carry_flag as u8) << 7;
 
-                // Bit 7 will always be 0 after a shift
-                self.processor_status.clear_carry_flag();
                 self.modify_zero_flag(self.accumulator);
+                self.modify_negative_flag(self.accumulator);
 
                 2
             }
@@ -339,9 +336,8 @@ impl Cpu {
                 value >>= 1;
                 value |= (old_carry_flag as u8) << 7;
 
-                // Bit 7 will always be 0 after a shift
-                self.processor_status.clear_carry_flag();
                 self.modify_zero_flag(value);
+                self.modify_negative_flag(value);
 
                 zeropage_write(self, low_byte, value);
 
@@ -360,9 +356,8 @@ impl Cpu {
                 value >>= 1;
                 value |= (old_carry_flag as u8) << 7;
 
-                // Bit 7 will always be 0 after a shift
-                self.processor_status.clear_carry_flag();
                 self.modify_zero_flag(value);
+                self.modify_negative_flag(value);
 
                 zeropage_x_write(self, low_byte, value);
 
@@ -381,9 +376,8 @@ impl Cpu {
                 value >>= 1;
                 value |= (old_carry_flag as u8) << 7;
 
-                // Bit 7 will always be 0 after a shift
-                self.processor_status.clear_carry_flag();
                 self.modify_zero_flag(value);
+                self.modify_negative_flag(value);
 
                 absolute_write(self, low_byte, high_byte, value);
 
@@ -402,9 +396,8 @@ impl Cpu {
                 value >>= 1;
                 value |= (old_carry_flag as u8) << 7;
 
-                // Bit 7 will always be 0 after a shift
-                self.processor_status.clear_carry_flag();
                 self.modify_zero_flag(value);
+                self.modify_negative_flag(value);
 
                 absolute_x_write(self, low_byte, high_byte, value);
 
