@@ -1,5 +1,7 @@
+use std::io::Read;
+
 use nes6502::{Cpu, CpuState};
-use serde::{Deserialize, Serialize};
+use sonic_rs::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Example {
@@ -58,7 +60,7 @@ fn load_examples() -> Vec<Example> {
     let mut all_examples = Vec::new();
 
     for (i, file) in std::fs::read_dir("65x02/nes6502/v1").unwrap().enumerate() {
-        if !(70..100).contains(&i) {
+        if !(90..100).contains(&i) {
             continue;
         }
 
@@ -67,8 +69,8 @@ fn load_examples() -> Vec<Example> {
         let path = file.path();
         let file_name = path.file_name().unwrap().to_str().unwrap();
         if file_name.ends_with(".json") {
-            let file = std::fs::File::open(path).unwrap();
-            let examples: Vec<Example> = serde_json::from_reader(file).unwrap();
+            let bytes = std::fs::read(path).unwrap();
+            let examples: Vec<Example> = sonic_rs::from_slice(&bytes).unwrap();
             all_examples.extend(examples);
         }
     }
