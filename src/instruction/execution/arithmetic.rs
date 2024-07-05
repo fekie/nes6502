@@ -399,77 +399,9 @@ impl Cpu {
 
     /// The intermediate code for SBC. Modifies the accumulator inside this method.
     fn sbc_intermediate(&mut self, value: u8) {
-        // adjust because we're subtracting,
-        // this is the shared sign if we are comparing (a) and (-v)
-        let adjusted_shared_sign = match (self.accumulator >> 7) != (value >> 7) {
-            true => Some(self.accumulator >> 7),
-            false => None,
-        };
-
-        dbg!(self.accumulator);
-        dbg!(value);
-        // store whether we need a carry before modifying the values
-        /* let carry_needed = (twos_compliment_to_signed(self.accumulator) as i16
-                   - twos_compliment_to_signed(value) as i16
-                   - (1 - self.processor_status.carry_flag() as i16))
-                   < 0;
-               dbg!(carry_needed);
-        */
-
-        dbg!(twos_compliment_to_signed(self.accumulator));
-        dbg!(twos_compliment_to_signed(value));
-        let should_be_negative = (twos_compliment_to_signed(self.accumulator) as i16
-            - twos_compliment_to_signed(value) as i16
-            - (1 - self.processor_status.carry_flag() as i16))
-            .is_negative();
-
-        self.accumulator = self.accumulator.wrapping_sub(value);
-        self.accumulator = self
-            .accumulator
-            .wrapping_sub(1 - self.processor_status.carry_flag() as u8);
-
-        // Modify the carry flag
-        /* match carry_needed {
-            true => self.processor_status.set_carry_flag(),
-            false => self.processor_status.clear_carry_flag(),
-        }; */
-
-        dbg!(should_be_negative);
-        dbg!(self.accumulator);
-
-        // -78 - -32
-        dbg!(should_be_negative as u8 == (self.accumulator >> 7));
-
-        // this is true if the sign is correct
-        match should_be_negative as u8 == (self.accumulator >> 7) {
-            true => {
-                self.processor_status.clear_overflow_flag();
-                self.processor_status.clear_carry_flag();
-            }
-            false => {
-                self.processor_status.set_overflow_flag();
-                self.processor_status.set_carry_flag();
-            }
-        }
-
-        // Modify the overflow flag
-        // If the signs were the same before the operation, they need to
-        // have the same sign as the result
-        /* match adjusted_shared_sign {
-            Some(x) => match (self.accumulator >> 7) == (x) {
-                true => self.processor_status.clear_overflow_flag(),
-                false => {
-                    // if overflow occurs then carry bit is clear
-                    self.processor_status.set_overflow_flag();
-                    self.processor_status.clear_carry_flag();
-                }
-            },
-            None => self.processor_status.clear_overflow_flag(),
-        } */
-
-        // Modify zero and negative flag
-        self.modify_zero_flag(self.accumulator);
-        self.modify_negative_flag(self.accumulator);
+        // We can do a bit of twos comp math and simplify the operation to ADC(value ^ 0xFF).
+        // The forum post on this is here: https://forums.nesdev.org/viewtopic.php?t=8703
+        self.adc_intermediate(value ^ 0xFF);
     }
 
     fn cmp_intermediate(&mut self, value: u8) {
