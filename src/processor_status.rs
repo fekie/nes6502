@@ -3,7 +3,7 @@
 /// The status of the processor. We have separate methods for setting, clearing,
 /// and getting. We do this as we may have to call these nearly every cpu cycle and
 /// we dont want to have to do another check or copy another byte.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct ProcessorStatus(pub u8);
 
 impl ProcessorStatus {
