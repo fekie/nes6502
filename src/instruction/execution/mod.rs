@@ -160,9 +160,10 @@ fn indirect_x_read(cpu: &Cpu, low_byte: Option<u8>) -> u8 {
 }
 
 fn indirect_x_write(cpu: &mut Cpu, low_byte: Option<u8>, value: u8) {
-    let base_address = low_byte.unwrap().wrapping_add(cpu.x) as u16;
+    let lsb_base_address = low_byte.unwrap().wrapping_add(cpu.x) as u16;
+    let msb_base_address = low_byte.unwrap().wrapping_add(cpu.x).wrapping_add(1) as u16;
 
-    let resolved_address = pack_bytes(cpu.read(base_address), cpu.read(base_address + 1));
+    let resolved_address = pack_bytes(cpu.read(lsb_base_address), cpu.read(msb_base_address));
 
     cpu.write(resolved_address, value);
 }

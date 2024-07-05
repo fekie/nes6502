@@ -288,15 +288,16 @@ impl Cpu {
     ) -> u8 {
         match addressing_mode {
             AddressingMode::Zeropage => {
-                zeropage_write(self, low_byte, self.x);
+                zeropage_write(self, low_byte, self.y);
+
                 3
             }
             AddressingMode::ZeropageXIndexed => {
-                zeropage_x_write(self, low_byte, self.x);
+                zeropage_x_write(self, low_byte, self.y);
                 4
             }
             AddressingMode::Absolute => {
-                absolute_write(self, low_byte, high_byte, self.x);
+                absolute_write(self, low_byte, high_byte, self.y);
                 4
             }
             _ => handle_invalid_addressing_mode(),
