@@ -4,6 +4,10 @@ use crate::ProcessorStatus;
 impl Cpu {
     pub(crate) fn instruction_tsx(&mut self) -> u8 {
         self.x = self.stack_pointer;
+
+        self.modify_zero_flag(self.x);
+        self.modify_negative_flag(self.x);
+
         2
     }
 

@@ -98,10 +98,16 @@ impl Cpu {
     pub(crate) fn instruction_ldx(
         &mut self,
 
-        addressing_mode: AddressingMode,
+        mut addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
     ) -> u8 {
+        // zeropage,x should be zeropage,y
+        addressing_mode = match addressing_mode {
+            AddressingMode::ZeropageXIndexed => AddressingMode::ZeropageYIndexed,
+            _ => addressing_mode,
+        };
+
         match addressing_mode {
             AddressingMode::Immediate => {
                 let value = immediate_read(low_byte);
@@ -121,8 +127,8 @@ impl Cpu {
 
                 3
             }
-            AddressingMode::ZeropageXIndexed => {
-                let value = zeropage_x_read(self, low_byte);
+            AddressingMode::ZeropageYIndexed => {
+                let value = zeropage_y_read(self, low_byte);
 
                 self.x = value;
                 self.modify_negative_flag(value);
@@ -258,10 +264,17 @@ impl Cpu {
     pub(crate) fn instruction_stx(
         &mut self,
 
-        addressing_mode: AddressingMode,
+        mut addressing_mode: AddressingMode,
         low_byte: Option<u8>,
         high_byte: Option<u8>,
     ) -> u8 {
+        // for whatever reason when we use a byte that normally represents ZeropageXIndexed, it means ZeropageYIndexed so we
+        // patch it in.
+        addressing_mode = match addressing_mode {
+            AddressingMode::ZeropageXIndexed => AddressingMode::ZeropageYIndexed,
+            _ => addressing_mode,
+        };
+
         match addressing_mode {
             AddressingMode::Zeropage => {
                 zeropage_write(self, low_byte, self.x);

@@ -103,6 +103,11 @@ fn zeropage_x_write(cpu: &mut Cpu, low_byte: Option<u8>, value: u8) {
     cpu.write(address, value);
 }
 
+fn zeropage_y_read(cpu: &Cpu, low_byte: Option<u8>) -> u8 {
+    let address = low_byte.unwrap().wrapping_add(cpu.y) as u16;
+    cpu.read(address)
+}
+
 fn zeropage_y_write(cpu: &mut Cpu, low_byte: Option<u8>, value: u8) {
     let address = low_byte.unwrap().wrapping_add(cpu.y) as u16;
     cpu.write(address, value);

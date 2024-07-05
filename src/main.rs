@@ -60,7 +60,7 @@ fn load_examples() -> Vec<Example> {
     let mut all_examples = Vec::new();
 
     for (i, file) in std::fs::read_dir("65x02/nes6502/v1").unwrap().enumerate() {
-        if !(0x82..0x85).contains(&i) {
+        if !(200..220).contains(&i) {
             continue;
         }
 
