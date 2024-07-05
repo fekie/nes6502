@@ -57,7 +57,6 @@ impl ProcessorStatus {
     pub fn clear_interrupt_disable_flag(&mut self) {
         let mask = 0b1111_1011;
         self.0 &= mask;
-        self.0 |= mask;
     }
 
     //

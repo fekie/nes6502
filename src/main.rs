@@ -19,7 +19,7 @@ pub enum CyclePart {
 }
 
 fn main() {
-    let current_test = r#"{ "name": "46 13 c2", "initial": { "pc": 4179, "s": 218, "a": 129, "x": 146, "y": 45, "p": 230, "ram": [ [4179, 70], [4180, 19], [4181, 194], [19, 87]]}, "final": { "pc": 4181, "s": 218, "a": 129, "x": 146, "y": 45, "p": 101, "ram": [ [19, 43], [4179, 70], [4180, 19], [4181, 194]]}, "cycles": [ [4179, 70, "read"], [4180, 19, "read"], [19, 87, "read"], [19, 87, "write"], [19, 43, "write"]] }"#;
+    /* let current_test = r#"{ "name": "58 aa 12", "initial": { "pc": 12360, "s": 147, "a": 15, "x": 154, "y": 104, "p": 34, "ram": [ [12360, 88], [12361, 170], [12362, 18]]}, "final": { "pc": 12361, "s": 147, "a": 15, "x": 154, "y": 104, "p": 34, "ram": [ [12360, 88], [12361, 170], [12362, 18]]}, "cycles": [ [12360, 88, "read"], [12361, 170, "read"]] }"#;
     let mut example: Example = serde_json::from_str(current_test).unwrap();
     example.initial_state.canonicalize();
     example.final_state.canonicalize();
@@ -32,9 +32,9 @@ fn main() {
         dbg!(instruction.unwrap());
         assert_eq!(final_state, example.final_state);
     }
-    println!("Current test success!");
+    println!("Current test success!"); */
 
-    /* let examples = load_examples();
+    let examples = load_examples();
 
     for example in examples {
         let mut cpu = Cpu::from_state(example.initial_state);
@@ -50,7 +50,7 @@ fn main() {
             dbg!(instruction.unwrap());
             assert_eq!(final_state, example.final_state);
         }
-    } */
+    }
 }
 
 fn load_examples() -> Vec<Example> {
