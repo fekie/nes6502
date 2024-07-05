@@ -1,7 +1,7 @@
 use super::{
-    absolute_read, absolute_write, absolute_x_read, absolute_x_write, absolute_y_read,
-    handle_invalid_addressing_mode, immediate_read, indirect_x_read, indirect_y_read,
-    zeropage_read, zeropage_write, zeropage_x_read, zeropage_x_write,
+    absolute_read, absolute_write, absolute_x_read, absolute_x_write,
+    handle_invalid_addressing_mode, zeropage_read, zeropage_write, zeropage_x_read,
+    zeropage_x_write,
 };
 use super::{AddressingMode, Cpu};
 

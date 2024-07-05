@@ -1,4 +1,4 @@
-use super::{AddressingMode, Cpu};
+use super::Cpu;
 use crate::ProcessorStatus;
 
 impl Cpu {

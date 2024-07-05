@@ -68,7 +68,7 @@ fn twos_compliment_to_signed(value: u8) -> i8 {
             let negative = (!value).wrapping_add(1);
 
             // we check for the case that we had -128, which wouldnt be converted
-            match (negative == 0b1000_0000) {
+            match negative == 0b1000_0000 {
                 true => -128,
                 false => -(negative as i8),
             }

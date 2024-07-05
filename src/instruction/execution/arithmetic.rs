@@ -1,5 +1,3 @@
-use crate::instruction::execution::twos_compliment_to_signed;
-
 use super::{
     absolute_read, absolute_x_read, absolute_y_read, handle_invalid_addressing_mode,
     immediate_read, indirect_x_read, indirect_y_read, zeropage_read, zeropage_x_read,

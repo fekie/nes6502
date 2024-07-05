@@ -464,21 +464,15 @@ pub struct CpuMemoryMapper {
 
 impl CpuMemoryMapper {
     pub fn new() -> Self {
+        Self::default()
+    }    
+}
+
+impl Default for CpuMemoryMapper {
+    fn default() -> Self {
         Self {
             work_ram: WorkRAM([0; 65536]),
         }
-    }
-
-    pub fn from_state(cpu_state: &CpuState) -> Self {
-        let mut work_ram = [0; 65536];
-
-        todo!()
-
-        /* for 
-
-        Self {
-            work_ram: cpu_state.ram
-        } */
     }
 }
 
