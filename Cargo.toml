@@ -2,7 +2,10 @@
 name = "nes6502"
 version = "0.1.0"
 edition = "2021"
-authors = ["fekie <68732833+fekie@users.noreply.github.com>"]
+authors = [
+    "fekie <68732833+fekie@users.noreply.github.com>",
+    "FBIGlowie <144389458+FBIGlowie@users.noreply.github.com>",
+]
 description = "An emulated NES version of the 6502."
 keywords = ["nes", "6502", "emulator"]
 license = "MIT"
