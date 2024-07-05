@@ -1,6 +1,6 @@
 use instruction::{FullOpcode, Instruction, Opcode};
 use processor_status::ProcessorStatus;
-use serde::{Deserialize, Serialize};
+use sonic_rs::{Deserialize, Serialize};
 
 const STACK_POINTER_STARTING_VALUE: u8 = 0xFF;
 pub const NMI_VECTOR_ADDRESS: u16 = 0xFFFA;

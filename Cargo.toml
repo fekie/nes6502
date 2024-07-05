@@ -2,8 +2,15 @@
 name = "nes6502"
 version = "0.1.0"
 edition = "2021"
+authors = ["fekie <68732833+fekie@users.noreply.github.com>"]
+description = "An emulated NES version of the 6502."
+keywords = ["nes", "6502", "emulator"]
+license = "MIT"
+repository = "https://github.com/fekie/nes6502"
+readme = "README.md"
+categories = ["emulator", "nes", "6502"]
+
 
 [dependencies]
 serde = { version = "1.0.203", features = ["derive"] }
-serde_json = "1.0.117"
 sonic-rs = "0.3"
