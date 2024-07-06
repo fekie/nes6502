@@ -56,10 +56,6 @@ fn load_tests() -> Vec<Example> {
     };
 
     for (i, file) in dir.enumerate() {
-        if !(100..=256).contains(&i) {
-            continue;
-        }
-
         let file = file.unwrap();
         println!("Reading test file {:?}", file.file_name());
         let path = file.path();
