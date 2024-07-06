@@ -1,7 +1,8 @@
 use super::Cpu;
+use crate::Mapper;
 use crate::ProcessorStatus;
 
-impl Cpu {
+impl<M: Mapper> Cpu<M> {
     pub(crate) fn instruction_tsx(&mut self) -> u8 {
         self.x = self.stack_pointer;
 

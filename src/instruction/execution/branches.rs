@@ -1,7 +1,8 @@
 use super::twos_compliment_to_signed;
 use super::Cpu;
+use crate::Mapper;
 
-impl Cpu {
+impl<M: Mapper> Cpu<M> {
     pub(crate) fn instruction_bcc(&mut self, low_byte: Option<u8>) -> u8 {
         let needs_branch = !self.processor_status.carry_flag();
         branch(self, low_byte, needs_branch)
@@ -44,7 +45,7 @@ impl Cpu {
 }
 
 /// Executes a branch based on whether it needs a branch.
-fn branch(cpu: &mut Cpu, low_byte: Option<u8>, needs_branch: bool) -> u8 {
+fn branch<M: Mapper>(cpu: &mut Cpu<M>, low_byte: Option<u8>, needs_branch: bool) -> u8 {
     let value = twos_compliment_to_signed(low_byte.unwrap());
     let original_page = cpu.program_counter >> 8;
 

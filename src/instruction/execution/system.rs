@@ -1,9 +1,10 @@
 use super::Cpu;
 use super::{pack_bytes, unpack_bytes};
 use crate::processor_status::ProcessorStatus;
+use crate::Mapper;
 use crate::IRQ_BRK_VECTOR_ADDRESS;
 
-impl Cpu {
+impl<M: Mapper> Cpu<M> {
     // more information on BRK https://www.nesdev.org/wiki/Visual6502wiki/6502_BRK_and_B_bit
     pub(crate) fn instruction_brk(&mut self) -> u8 {
         // we skip ahead 1 byte because the byte after a BRK provides debugging information

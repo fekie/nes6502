@@ -1,7 +1,8 @@
 use super::{handle_invalid_addressing_mode, pack_bytes, pack_bytes_wrapped, unpack_bytes};
 use super::{AddressingMode, Cpu};
+use crate::Mapper;
 
-impl Cpu {
+impl<M: Mapper> Cpu<M> {
     pub(crate) fn instruction_jmp(
         &mut self,
 

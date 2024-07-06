@@ -1,6 +1,7 @@
 use super::Cpu;
+use crate::Mapper;
 
-impl Cpu {
+impl<M: Mapper> Cpu<M> {
     pub(crate) fn instruction_clc(&mut self) -> u8 {
         self.processor_status.clear_carry_flag();
         2

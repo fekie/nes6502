@@ -16,8 +16,39 @@ pub trait Mapper {
     fn write(&mut self, address: u16, byte: u8);
 }
 
+
+/// Emulates an NES version of the 6502.
+/// 
+/// # Examples
+/// ### Creating a memory mapper mapped to 64KB of ram.
+/// ```example
+/// struct Memory([u8; 0x10000]);
+/// 
+/// impl Memory {
+///     pub fn new() -> Self {
+///         Self([0; 0x10000])
+///     }
+/// }
+/// 
+/// impl Mapper for Memory {
+///     fn read(&self, address: u16) -> u8 {
+///         self.0[address as usize]
+///     }
+/// 
+///     fn write(&mut self, address: u16, byte: u8) {
+///         self.0[address as usize] = byte
+///     }
+/// }
+/// 
+/// fn main() {
+///     let memory = Memory::new();
+///     let mut cpu = Cpu::new(memory);
+/// 
+///     let machine_cycles_taken = cpu.cycle();
+/// }
+/// ```
 #[allow(clippy::upper_case_acronyms)]
-pub struct Cpu {
+pub struct Cpu<M: Mapper> {
     pub accumulator: u8,
     pub x: u8,
     pub y: u8,
@@ -25,7 +56,7 @@ pub struct Cpu {
     pub program_counter: u16,
     pub registers: [u8; 6],
     pub processor_status: ProcessorStatus,
-    pub memory_mapper: CpuMemoryMapper,
+    pub memory_mapper: M,
     pub initialized: bool,
 }
 
@@ -44,23 +75,6 @@ pub struct CpuState {
     /// within a u16
     pub ram: Vec<Vec<u16>>,
 }
-
-impl CpuState {
-    // Removes zeroed memory from ram.
-    pub fn canonicalize(&mut self) {
-        self.ram = {
-            let mut cloned = self.ram.clone();
-            cloned.sort_by(|a, b| {
-                a[0].cmp(&b[0])
-            });
-            cloned.into_iter().filter(|x| {
-                x[1] != 0
-            }).collect::<Vec<Vec<u16>>>()
-        };
-    }
-}
-
-
 
 impl PartialEq for CpuState {
     fn eq(&self, other: &Self) -> bool {
@@ -91,11 +105,11 @@ impl PartialEq for CpuState {
     }
 }
 
-impl Cpu {
+impl<M: Mapper> Cpu<M> {
     /// Creates a new Cpu but does not initialize it as it needs to be connected
     /// to the bus to initialize. You can initialize it with [`Self::initialize`].
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new(memory_mapper: M) -> Self {
         Self {
             accumulator: 0,
             x: 0,
@@ -104,18 +118,17 @@ impl Cpu {
             program_counter: 0,
             registers: [0; 6],
             processor_status: ProcessorStatus::new(),
-            memory_mapper: CpuMemoryMapper::new(),
+            memory_mapper,
             initialized: false,
         }
     }
 
-    pub fn from_state(cpu_state: CpuState) -> Self {
-        let mut memory_mapper = CpuMemoryMapper::new();
+    pub fn from_state(cpu_state: CpuState, mut memory_mapper: M) -> Self {
         for chunk in &cpu_state.ram {
             let address = chunk[0];
             let value = chunk[1];
 
-            memory_mapper.work_ram.0[address as usize] = value as u8;
+            memory_mapper.write(address, value as u8);
         }
 
         let cpu = Self {
@@ -137,17 +150,18 @@ impl Cpu {
     }
 
     pub fn state(&self) -> CpuState {
-        let ram = self
-            .memory_mapper
-            .work_ram
-            .0
-            .iter()
-            .enumerate()
-            .filter_map(|(i, value)| match *value != 0 {
-                true => Some(vec![i as u16, *value as u16]),
-                false => None,
-            })
-            .collect::<Vec<Vec<u16>>>();
+        let ram = {
+            let mut ram = Vec::new();
+
+            for i in 0..=65535 {
+                let value = self.read(i);
+                if value != 0 {
+                    ram.push(vec![i, value as u16])
+                }
+            }
+
+            ram
+        };
 
         CpuState {
             pc: self.program_counter,

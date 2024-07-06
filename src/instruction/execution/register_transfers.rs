@@ -1,6 +1,7 @@
 use super::Cpu;
+use crate::Mapper;
 
-impl Cpu {
+impl<M: Mapper> Cpu<M> {
     pub(crate) fn instruction_tax(&mut self) -> u8 {
         self.x = self.accumulator;
         self.modify_negative_flag(self.x);

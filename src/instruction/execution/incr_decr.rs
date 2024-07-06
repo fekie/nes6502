@@ -4,8 +4,9 @@ use super::{
     zeropage_x_write,
 };
 use super::{AddressingMode, Cpu};
+use crate::Mapper;
 
-impl Cpu {
+impl<M: Mapper> Cpu<M> {
     pub(crate) fn instruction_inc(
         &mut self,
 

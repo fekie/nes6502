@@ -1,4 +1,4 @@
-use nes6502::{Cpu, CpuState};
+use nes6502::{Cpu, CpuState, Mapper};
 use sonic_rs::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -18,11 +18,30 @@ pub enum CyclePart {
     String(String),
 }
 
+struct Memory([u8; 0x10000]);
+
+impl Memory {
+    pub fn new() -> Self {
+        Self([0; 0x10000])
+    }
+}
+
+impl Mapper for Memory {
+    fn read(&self, address: u16) -> u8 {
+        self.0[address as usize]
+    }
+
+    fn write(&mut self, address: u16, byte: u8) {
+        self.0[address as usize] = byte
+    }
+}
+
 fn main() {
     let examples = load_tests();
 
     for example in examples {
-        let mut cpu = Cpu::from_state(example.initial_state);
+        let memory = Memory::new();
+        let mut cpu = Cpu::from_state(example.initial_state, memory);
         println!("Running test {}", example.name);
         let (_, success, instruction) = cpu.cycle_debug();
 
