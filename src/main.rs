@@ -38,6 +38,8 @@ fn main() {
             assert_eq!(final_state, example.final_state);
         }
     }
+
+    println!("All tests completed!");
 }
 
 fn load_tests() -> Vec<Example> {
@@ -57,10 +59,10 @@ fn load_tests() -> Vec<Example> {
 
     for (i, file) in dir.enumerate() {
         let file = file.unwrap();
-        println!("Reading test file {:?}", file.file_name());
         let path = file.path();
         let file_name = path.file_name().unwrap().to_str().unwrap();
         if file_name.ends_with(".json") {
+            println!("Reading test file {:?}", file.file_name());
             let bytes = std::fs::read(path).unwrap();
             let examples: Vec<Example> = sonic_rs::from_slice(&bytes).unwrap();
             all_examples.extend(examples);
