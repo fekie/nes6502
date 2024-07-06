@@ -56,7 +56,7 @@ fn load_tests() -> Vec<Example> {
     };
 
     for (i, file) in dir.enumerate() {
-        if !(40..=100).contains(&i) {
+        if !(100..=256).contains(&i) {
             continue;
         }
 
