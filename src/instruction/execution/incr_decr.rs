@@ -17,7 +17,7 @@ impl Cpu {
             AddressingMode::Zeropage => {
                 let mut value = zeropage_read(self, low_byte);
 
-                value += 1;
+                value = value.wrapping_add(1);
 
                 self.modify_zero_flag(value);
                 self.modify_negative_flag(value);
@@ -29,7 +29,7 @@ impl Cpu {
             AddressingMode::ZeropageXIndexed => {
                 let mut value = zeropage_x_read(self, low_byte);
 
-                value += 1;
+                value = value.wrapping_add(1);
 
                 self.modify_zero_flag(value);
                 self.modify_negative_flag(value);
@@ -41,7 +41,7 @@ impl Cpu {
             AddressingMode::Absolute => {
                 let mut value = absolute_read(self, low_byte, high_byte);
 
-                value += 1;
+                value = value.wrapping_add(1);
 
                 self.modify_zero_flag(value);
                 self.modify_negative_flag(value);
@@ -53,7 +53,7 @@ impl Cpu {
             AddressingMode::AbsoluteXIndexed => {
                 let (mut value, _) = absolute_x_read(self, low_byte, high_byte);
 
-                value += 1;
+                value = value.wrapping_add(1);
 
                 self.modify_zero_flag(value);
                 self.modify_negative_flag(value);
@@ -67,7 +67,7 @@ impl Cpu {
     }
 
     pub(crate) fn instruction_inx(&mut self) -> u8 {
-        self.x += 1;
+        self.x = self.x.wrapping_add(1);
 
         self.modify_zero_flag(self.x);
         self.modify_negative_flag(self.x);
@@ -76,7 +76,7 @@ impl Cpu {
     }
 
     pub(crate) fn instruction_iny(&mut self) -> u8 {
-        self.y += 1;
+        self.y = self.y.wrapping_add(1);
 
         self.modify_zero_flag(self.y);
         self.modify_negative_flag(self.y);
@@ -95,7 +95,7 @@ impl Cpu {
             AddressingMode::Zeropage => {
                 let mut value = zeropage_read(self, low_byte);
 
-                value -= 1;
+                value = value.wrapping_sub(1);
 
                 self.modify_zero_flag(value);
                 self.modify_negative_flag(value);
@@ -107,7 +107,7 @@ impl Cpu {
             AddressingMode::ZeropageXIndexed => {
                 let mut value = zeropage_x_read(self, low_byte);
 
-                value -= 1;
+                value = value.wrapping_sub(1);
 
                 self.modify_zero_flag(value);
                 self.modify_negative_flag(value);
@@ -119,7 +119,7 @@ impl Cpu {
             AddressingMode::Absolute => {
                 let mut value = absolute_read(self, low_byte, high_byte);
 
-                value -= 1;
+                value = value.wrapping_sub(1);
 
                 self.modify_zero_flag(value);
                 self.modify_negative_flag(value);
@@ -131,7 +131,7 @@ impl Cpu {
             AddressingMode::AbsoluteXIndexed => {
                 let (mut value, _) = absolute_x_read(self, low_byte, high_byte);
 
-                value -= 1;
+                value = value.wrapping_sub(1);
 
                 self.modify_zero_flag(value);
                 self.modify_negative_flag(value);
@@ -145,7 +145,7 @@ impl Cpu {
     }
 
     pub(crate) fn instruction_dex(&mut self) -> u8 {
-        self.x -= 1;
+        self.x = self.x.wrapping_sub(1);
 
         self.modify_zero_flag(self.x);
         self.modify_negative_flag(self.x);
@@ -154,7 +154,7 @@ impl Cpu {
     }
 
     pub(crate) fn instruction_dey(&mut self) -> u8 {
-        self.y -= 1;
+        self.y = self.y.wrapping_sub(1);
 
         self.modify_zero_flag(self.y);
         self.modify_negative_flag(self.y);

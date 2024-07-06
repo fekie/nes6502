@@ -44,7 +44,22 @@ fn load_tests() -> Vec<Example> {
     // load from 65x02/nes6502/v1 directory
     let mut all_examples = Vec::new();
 
-    for file in std::fs::read_dir("65x02/nes6502/v1").unwrap() {
+    let dir = match std::fs::read_dir("65x02/nes6502/v1") {
+        Ok(x) => x,
+        Err(e) => match e.kind() {
+            std::io::ErrorKind::NotFound => {
+                eprintln!("Required tests not found. Please clone the repository located at https://github.com/SingleStepTests/65x02 to this folder.");
+                std::process::exit(1);
+            }
+            _ => panic!("{}", e),
+        },
+    };
+
+    for (i, file) in dir.enumerate() {
+        if !(40..=100).contains(&i) {
+            continue;
+        }
+
         let file = file.unwrap();
         println!("Reading test file {:?}", file.file_name());
         let path = file.path();

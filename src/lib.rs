@@ -230,18 +230,18 @@ impl Cpu {
         let (low_byte, high_byte) = match bytes_required {
             1 => (None, None),
             2 => (
-                Some(self.memory_mapper.read(self.program_counter + 1)),
+                Some(self.memory_mapper.read(self.program_counter.wrapping_add(1))),
                 None,
             ),
             3 => (
-                Some(self.memory_mapper.read(self.program_counter + 1)),
-                Some(self.memory_mapper.read(self.program_counter + 2)),
+                Some(self.memory_mapper.read(self.program_counter.wrapping_add(1))),
+                Some(self.memory_mapper.read(self.program_counter.wrapping_add(2))),
             ),
             _ => unreachable!(),
         };
 
         // Decide how much we need to increment the PC
-        self.program_counter += bytes_required;
+        self.program_counter = self.program_counter.wrapping_add(bytes_required);
 
         Some(Instruction {
                     opcode: full_opcode.opcode,

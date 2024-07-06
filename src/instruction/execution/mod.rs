@@ -35,12 +35,12 @@ impl Cpu {
     fn push(&mut self, byte: u8) {
         self.write(0x0100 | self.stack_pointer as u16, byte);
 
-        self.stack_pointer -= 1;
+        self.stack_pointer = self.stack_pointer.wrapping_sub(1);
     }
 
     // Pops a value from the stack
     fn pop(&mut self) -> u8 {
-        self.stack_pointer += 1;
+        self.stack_pointer = self.stack_pointer.wrapping_add(1);
 
         self.read(0x0100 | self.stack_pointer as u16)
     }
@@ -179,8 +179,8 @@ fn indirect_y_read(cpu: &Cpu, low_byte: Option<u8>) -> (u8, bool) {
 
     let page_changed = low_base_address > high_base_address;
 
-    let resolved_address =
-        pack_bytes(cpu.read(low_base_address), cpu.read(high_base_address)) + cpu.y as u16;
+    let resolved_address = pack_bytes(cpu.read(low_base_address), cpu.read(high_base_address))
+        .wrapping_add(cpu.y as u16);
 
     (cpu.read(resolved_address), page_changed)
 }
@@ -189,8 +189,8 @@ fn indirect_y_write(cpu: &mut Cpu, low_byte: Option<u8>, value: u8) {
     let low_base_address = low_byte.unwrap() as u16;
     let high_base_address = low_byte.unwrap().wrapping_add(1) as u16;
 
-    let resolved_address =
-        pack_bytes(cpu.read(low_base_address), cpu.read(high_base_address)) + cpu.y as u16;
+    let resolved_address = pack_bytes(cpu.read(low_base_address), cpu.read(high_base_address))
+        .wrapping_add(cpu.y as u16);
 
     cpu.write(resolved_address, value);
 }
