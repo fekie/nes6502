@@ -16,12 +16,13 @@ pub trait Mapper {
     fn write(&mut self, address: u16, byte: u8);
 }
 
-
 /// Emulates an NES version of the 6502.
 /// 
 /// # Examples
 /// ### Creating a memory mapper mapped to 64KB of ram.
-/// ```example
+/// ```
+/// use nes6502::{Cpu, Mapper};
+/// 
 /// struct Memory([u8; 0x10000]);
 /// 
 /// impl Memory {
@@ -40,12 +41,12 @@ pub trait Mapper {
 ///     }
 /// }
 /// 
-/// fn main() {
-///     let memory = Memory::new();
-///     let mut cpu = Cpu::new(memory);
+///
+/// let memory = Memory::new();
+/// let mut cpu = Cpu::new(memory);
 /// 
-///     let machine_cycles_taken = cpu.cycle();
-/// }
+/// let machine_cycles_taken = cpu.cycle();
+///
 /// ```
 #[allow(clippy::upper_case_acronyms)]
 pub struct Cpu<M: Mapper> {
@@ -59,6 +60,12 @@ pub struct Cpu<M: Mapper> {
     pub memory_mapper: M,
     pub initialized: bool,
 }
+
+impl<M:Mapper> Cpu<M> {
+    
+}
+
+
 
 /// The state of the CPU. The `ram` field is the non-zero memory
 /// locations in [address, value]
@@ -174,8 +181,7 @@ impl<M: Mapper> Cpu<M> {
         }
     }
 
-    /// Initializes the Cpu to a state ready to run instructions.
-    pub fn initialize(&mut self) {
+    pub fn reset(&mut self) {
         self.processor_status.clear_carry_flag();
         self.processor_status.clear_zero_flag();
         self.processor_status.set_interrupt_disable_flag();
@@ -183,15 +189,19 @@ impl<M: Mapper> Cpu<M> {
         self.processor_status.clear_overflow_flag();
         self.processor_status.clear_negative_flag();
         self.processor_status.clear_break_flag();
-
+    
         self.stack_pointer = STACK_POINTER_STARTING_VALUE;
-
+    
         self.program_counter = {
             let low_byte = self.memory_mapper.read(RESET_VECTOR_ADDRESS) as u16;
-            let high_byte = self.memory_mapper.read(RESET_VECTOR_ADDRESS + 1) as u16;
+            let high_byte = self.memory_mapper.read( RESET_VECTOR_ADDRESS + 1) as u16;
             (high_byte << 8) + low_byte
         };
-
+    }
+    
+    /// Initializes the CPU to a state ready to run instructions.
+    pub fn initialize(&mut self) {
+        self.reset();
         self.initialized = true;
     }
 
@@ -209,9 +219,6 @@ impl<M: Mapper> Cpu<M> {
         } */
         // fetch
         let instruction = self.fetch().unwrap();
-        //self.pretty_print_cpu_state(instruction);
-
-        
 
         // execute
         self.execute(instruction)
@@ -224,8 +231,6 @@ impl<M: Mapper> Cpu<M> {
             None => return (0, false, None),
         };
         //self.pretty_print_cpu_state(instruction);
-
-        // todo: make it so we have a flag to let us skip illegal instructions
 
         // execute
         (self.execute(instruction), true, Some(instruction))
@@ -449,55 +454,5 @@ impl<M: Mapper> Cpu<M> {
             self.processor_status.negative_flag()
         );
         println!("------------------------------------");
-    }
-}
-
-// We use 2KB of work ram.
-#[derive(Debug)]
-pub struct WorkRAM([u8; 0x10000]);
-
-/// Memory Map:
-///
-/// | Address range |  Size  |                                  Device                                  |   |   |
-/// |:-------------:|:------:|:------------------------------------------------------------------------:|---|---|
-/// | $0000–$07FF   | $0800  | 2 KB internal RAM                                                        |   |   |
-/// | $0800–$0FFF   | $0800  | Mirror  of $0000–$07FF                                                   |   |   |
-/// | $1000–$17FF   | $0800  | Mirror  of $0000–$07FF                                                   |   |   |
-/// | $1800–$1FFF   | $0800  | Mirror  of $0000–$07FF                                                   |   |   |
-/// | $2000–$2007   | $0008  | NES PPU registers                                                        |   |   |
-/// | $2008–$3FFF   | $1FF8  | Mirrors of $2000–$2007 (repeats every 8 bytes)                           |   |   |
-/// | $4000–$4017   | $0018  | NES APU and I/O registers                                                |   |   |
-/// | $4018–$401F   | $0008  | APU and I/O functionality that is normally disabled. See Cpu Test Mode.  |   |   |
-/// | $4020–$FFFF   | $BFE0  | Unmapped. Available for cartridge use.                                   |   |   |
-/// | *$6000-$7FFF  | $2000  | Usually cartridge RAM, when present.                                     |   |   |
-/// | *$8000-$FFFF  | $8000  | Usually cartridge ROM and mapper registers.                              |   |   |
-#[derive(Debug)]
-pub struct CpuMemoryMapper {
-    work_ram: WorkRAM,
-}
-
-impl CpuMemoryMapper {
-    pub fn new() -> Self {
-        Self::default()
-    }    
-}
-
-impl Default for CpuMemoryMapper {
-    fn default() -> Self {
-        Self {
-            work_ram: WorkRAM([0; 65536]),
-        }
-    }
-}
-
-impl Mapper for CpuMemoryMapper {
-    fn read(&self, address: u16) -> u8 {
-        // harte's tests (https://github.com/SingleStepTests/ProcessorTests/tree/main/nes6502)
-        // require the entire address space mapped to RAM
-        self.work_ram.0[address as usize]
-    }
-
-    fn write(&mut self, address: u16, byte: u8) {
-        self.work_ram.0[address as usize] = byte;
     }
 }
