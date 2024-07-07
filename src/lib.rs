@@ -49,6 +49,9 @@ pub trait Mapper {
 ///
 /// ```
 #[allow(clippy::upper_case_acronyms)]
+#[derive(
+    Copy, Clone, Debug, Default
+)]
 pub struct Cpu<M: Mapper> {
     pub accumulator: u8,
     pub x: u8,
@@ -69,7 +72,9 @@ impl<M:Mapper> Cpu<M> {
 
 /// The state of the CPU. The `ram` field is the non-zero memory
 /// locations in [address, value]
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, 
+   Eq, Ord, PartialOrd, Default
+)]
 pub struct CpuState {
     pub pc: u16,
     pub s: u8,
