@@ -76,7 +76,7 @@ fn load_tests() -> Vec<Example> {
         },
     };
 
-    for (i, file) in dir.enumerate() {
+    for file in dir {
         let file = file.unwrap();
         let path = file.path();
         let file_name = path.file_name().unwrap().to_str().unwrap();
