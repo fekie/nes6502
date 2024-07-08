@@ -3,9 +3,10 @@ use super::{
     immediate_read, indirect_x_read, indirect_y_read, zeropage_read, zeropage_x_read,
 };
 use super::{AddressingMode, Cpu};
+use crate::Interrupts;
 use crate::Mapper;
 
-impl<M: Mapper> Cpu<M> {
+impl<M: Mapper, I: Interrupts> Cpu<M, I> {
     pub(crate) fn instruction_adc(
         &mut self,
 
@@ -352,7 +353,7 @@ impl<M: Mapper> Cpu<M> {
     }
 }
 
-impl<M: Mapper> Cpu<M> {
+impl<M: Mapper, I: Interrupts> Cpu<M, I> {
     /// The intermediate code for ADC. Modifies the accumulator inside this method.
     fn adc_intermediate(&mut self, value: u8) {
         // If the sign bits are the same, then we need to check if they

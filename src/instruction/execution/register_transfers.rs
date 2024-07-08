@@ -1,7 +1,8 @@
 use super::Cpu;
+use crate::Interrupts;
 use crate::Mapper;
 
-impl<M: Mapper> Cpu<M> {
+impl<M: Mapper, I: Interrupts> Cpu<M, I> {
     pub(crate) fn instruction_tax(&mut self) -> u8 {
         self.x = self.accumulator;
         self.modify_negative_flag(self.x);

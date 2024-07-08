@@ -1,4 +1,4 @@
-use nes6502::{Cpu, CpuState, Mapper};
+use nes6502::{Cpu, CpuState, Interrupts, Mapper};
 use sonic_rs::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -36,12 +36,44 @@ impl Mapper for Memory {
     }
 }
 
+#[derive(Default)]
+pub struct InterruptsContainer {
+    pub interrupt: bool,
+    pub non_maskable_interrupt: bool,
+}
+
+impl InterruptsContainer {
+    fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl Interrupts for InterruptsContainer {
+    fn interrupt_state(&self) -> bool {
+        self.interrupt
+    }
+
+    fn set_interrupt_state(&mut self, new_state: bool) {
+        self.interrupt = new_state;
+    }
+
+    fn non_maskable_interrupt_state(&self) -> bool {
+        self.non_maskable_interrupt
+    }
+
+    fn set_non_maskable_interrupt_state(&mut self, new_state: bool) {
+        self.non_maskable_interrupt = new_state;
+    }
+}
+
 fn main() {
     let examples = load_tests();
 
     for example in examples {
         let memory = Memory::new();
-        let mut cpu = Cpu::from_state(example.initial_state, memory);
+        let interrupts = InterruptsContainer::new();
+
+        let mut cpu = Cpu::from_state(example.initial_state, memory, interrupts);
         println!("Running test {}", example.name);
         let (_, success, instruction) = cpu.cycle_debug();
 

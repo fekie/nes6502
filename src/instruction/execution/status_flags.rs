@@ -1,7 +1,8 @@
 use super::Cpu;
+use crate::Interrupts;
 use crate::Mapper;
 
-impl<M: Mapper> Cpu<M> {
+impl<M: Mapper, I: Interrupts> Cpu<M, I> {
     pub(crate) fn instruction_clc(&mut self) -> u8 {
         self.processor_status.clear_carry_flag();
         2

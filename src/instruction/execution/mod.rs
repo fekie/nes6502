@@ -1,4 +1,5 @@
 use super::{AddressingMode, Cpu};
+use crate::Interrupts;
 use crate::Mapper;
 
 // We organize the instructions using modules according to the
@@ -15,7 +16,7 @@ mod stack;
 mod status_flags;
 mod system;
 
-impl<M: Mapper> Cpu<M> {
+impl<M: Mapper, I: Interrupts> Cpu<M, I> {
     /// Sets the zero flag if the given byte is 0.
     fn modify_zero_flag(&mut self, byte: u8) {
         match byte == 0 {
@@ -83,44 +84,56 @@ fn immediate_read(low_byte: Option<u8>) -> u8 {
     low_byte.unwrap()
 }
 
-fn zeropage_read<M: Mapper>(cpu: &Cpu<M>, low_byte: Option<u8>) -> u8 {
+fn zeropage_read<M: Mapper, I: Interrupts>(cpu: &Cpu<M, I>, low_byte: Option<u8>) -> u8 {
     let address = low_byte.unwrap() as u16;
     cpu.read(address)
 }
 
 // value is the value written to memory
-fn zeropage_write<M: Mapper>(cpu: &mut Cpu<M>, low_byte: Option<u8>, value: u8) {
+fn zeropage_write<M: Mapper, I: Interrupts>(cpu: &mut Cpu<M, I>, low_byte: Option<u8>, value: u8) {
     let address = low_byte.unwrap() as u16;
     cpu.write(address, value);
 }
 
-fn zeropage_x_read<M: Mapper>(cpu: &Cpu<M>, low_byte: Option<u8>) -> u8 {
+fn zeropage_x_read<M: Mapper, I: Interrupts>(cpu: &Cpu<M, I>, low_byte: Option<u8>) -> u8 {
     let address = low_byte.unwrap().wrapping_add(cpu.x) as u16;
     cpu.read(address)
 }
 
-fn zeropage_x_write<M: Mapper>(cpu: &mut Cpu<M>, low_byte: Option<u8>, value: u8) {
+fn zeropage_x_write<M: Mapper, I: Interrupts>(
+    cpu: &mut Cpu<M, I>,
+    low_byte: Option<u8>,
+    value: u8,
+) {
     let address = low_byte.unwrap().wrapping_add(cpu.x) as u16;
     cpu.write(address, value);
 }
 
-fn zeropage_y_read<M: Mapper>(cpu: &Cpu<M>, low_byte: Option<u8>) -> u8 {
+fn zeropage_y_read<M: Mapper, I: Interrupts>(cpu: &Cpu<M, I>, low_byte: Option<u8>) -> u8 {
     let address = low_byte.unwrap().wrapping_add(cpu.y) as u16;
     cpu.read(address)
 }
 
-fn zeropage_y_write<M: Mapper>(cpu: &mut Cpu<M>, low_byte: Option<u8>, value: u8) {
+fn zeropage_y_write<M: Mapper, I: Interrupts>(
+    cpu: &mut Cpu<M, I>,
+    low_byte: Option<u8>,
+    value: u8,
+) {
     let address = low_byte.unwrap().wrapping_add(cpu.y) as u16;
     cpu.write(address, value);
 }
 
-fn absolute_read<M: Mapper>(cpu: &Cpu<M>, low_byte: Option<u8>, high_byte: Option<u8>) -> u8 {
+fn absolute_read<M: Mapper, I: Interrupts>(
+    cpu: &Cpu<M, I>,
+    low_byte: Option<u8>,
+    high_byte: Option<u8>,
+) -> u8 {
     let address = pack_bytes_wrapped(low_byte, high_byte);
     cpu.read(address)
 }
 
-fn absolute_write<M: Mapper>(
-    cpu: &mut Cpu<M>,
+fn absolute_write<M: Mapper, I: Interrupts>(
+    cpu: &mut Cpu<M, I>,
     low_byte: Option<u8>,
     high_byte: Option<u8>,
     value: u8,
@@ -130,8 +143,8 @@ fn absolute_write<M: Mapper>(
 }
 
 /// Returns the value and whether a page boundary was crossed.
-fn absolute_x_read<M: Mapper>(
-    cpu: &Cpu<M>,
+fn absolute_x_read<M: Mapper, I: Interrupts>(
+    cpu: &Cpu<M, I>,
     low_byte: Option<u8>,
     high_byte: Option<u8>,
 ) -> (u8, bool) {
@@ -143,8 +156,8 @@ fn absolute_x_read<M: Mapper>(
     (cpu.read(address), page_changed)
 }
 
-fn absolute_x_write<M: Mapper>(
-    cpu: &mut Cpu<M>,
+fn absolute_x_write<M: Mapper, I: Interrupts>(
+    cpu: &mut Cpu<M, I>,
     low_byte: Option<u8>,
     high_byte: Option<u8>,
     value: u8,
@@ -155,8 +168,8 @@ fn absolute_x_write<M: Mapper>(
 }
 
 /// Returns the value and whether a page boundary was crossed.
-fn absolute_y_read<M: Mapper>(
-    cpu: &Cpu<M>,
+fn absolute_y_read<M: Mapper, I: Interrupts>(
+    cpu: &Cpu<M, I>,
     low_byte: Option<u8>,
     high_byte: Option<u8>,
 ) -> (u8, bool) {
@@ -168,8 +181,8 @@ fn absolute_y_read<M: Mapper>(
     (cpu.read(address), page_changed)
 }
 
-fn absolute_y_write<M: Mapper>(
-    cpu: &mut Cpu<M>,
+fn absolute_y_write<M: Mapper, I: Interrupts>(
+    cpu: &mut Cpu<M, I>,
     low_byte: Option<u8>,
     high_byte: Option<u8>,
     value: u8,
@@ -179,7 +192,7 @@ fn absolute_y_write<M: Mapper>(
     cpu.write(address, value);
 }
 
-fn indirect_x_read<M: Mapper>(cpu: &Cpu<M>, low_byte: Option<u8>) -> u8 {
+fn indirect_x_read<M: Mapper, I: Interrupts>(cpu: &Cpu<M, I>, low_byte: Option<u8>) -> u8 {
     let address_low_byte = cpu.read(low_byte.unwrap().wrapping_add(cpu.x) as u16);
     let address_high_byte = cpu.read(low_byte.unwrap().wrapping_add(cpu.x).wrapping_add(1) as u16);
 
@@ -188,7 +201,11 @@ fn indirect_x_read<M: Mapper>(cpu: &Cpu<M>, low_byte: Option<u8>) -> u8 {
     cpu.read(address)
 }
 
-fn indirect_x_write<M: Mapper>(cpu: &mut Cpu<M>, low_byte: Option<u8>, value: u8) {
+fn indirect_x_write<M: Mapper, I: Interrupts>(
+    cpu: &mut Cpu<M, I>,
+    low_byte: Option<u8>,
+    value: u8,
+) {
     let lsb_base_address = low_byte.unwrap().wrapping_add(cpu.x) as u16;
     let msb_base_address = low_byte.unwrap().wrapping_add(cpu.x).wrapping_add(1) as u16;
 
@@ -197,7 +214,7 @@ fn indirect_x_write<M: Mapper>(cpu: &mut Cpu<M>, low_byte: Option<u8>, value: u8
     cpu.write(resolved_address, value);
 }
 
-fn indirect_y_read<M: Mapper>(cpu: &Cpu<M>, low_byte: Option<u8>) -> (u8, bool) {
+fn indirect_y_read<M: Mapper, I: Interrupts>(cpu: &Cpu<M, I>, low_byte: Option<u8>) -> (u8, bool) {
     let low_base_address = low_byte.unwrap() as u16;
     let high_base_address = low_byte.unwrap().wrapping_add(1) as u16;
 
@@ -209,7 +226,11 @@ fn indirect_y_read<M: Mapper>(cpu: &Cpu<M>, low_byte: Option<u8>) -> (u8, bool) 
     (cpu.read(resolved_address), page_changed)
 }
 
-fn indirect_y_write<M: Mapper>(cpu: &mut Cpu<M>, low_byte: Option<u8>, value: u8) {
+fn indirect_y_write<M: Mapper, I: Interrupts>(
+    cpu: &mut Cpu<M, I>,
+    low_byte: Option<u8>,
+    value: u8,
+) {
     let low_base_address = low_byte.unwrap() as u16;
     let high_base_address = low_byte.unwrap().wrapping_add(1) as u16;
 
