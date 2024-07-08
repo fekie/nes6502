@@ -1,6 +1,6 @@
 [package]
 name = "nes6502"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = [
     "fekie <rust.crates@fekie.dev>",
