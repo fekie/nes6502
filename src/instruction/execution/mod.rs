@@ -14,7 +14,7 @@ mod register_transfers;
 mod shifts;
 mod stack;
 mod status_flags;
-mod system;
+pub(crate) mod system;
 
 impl<M: Mapper, I: Interrupts> Cpu<M, I> {
     /// Sets the zero flag if the given byte is 0.

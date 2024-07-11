@@ -3,7 +3,7 @@
 
 use super::Cpu;
 
-mod execution;
+pub(crate) mod execution;
 
 // https://emudev.de/nes-emulator/opcodes-and-addressing-modes-the-6502/   <-- good stuff
 // https://blogs.oregonstate.edu/ericmorgan/2022/01/21/6502-addressing-modes/  <--- also this too

@@ -1,6 +1,7 @@
 use instruction::{FullOpcode, Instruction, Opcode};
 use processor_status::ProcessorStatus;
 use sonic_rs::{Deserialize, Serialize};
+use instruction::execution::system::InterruptState;
 
 pub const STACK_POINTER_STARTING_VALUE: u8 = 0xFD;
 pub const NMI_VECTOR_ADDRESS: u16 = 0xFFFA;
@@ -203,13 +204,7 @@ impl<M: Mapper, I: Interrupts> Cpu<M, I> {
         self.processor_status.clear_negative_flag();
         self.processor_status.clear_break_flag();
 
-        self.stack_pointer = STACK_POINTER_STARTING_VALUE;
-
-        self.program_counter = {
-            let low_byte = self.memory_mapper.read(RESET_VECTOR_ADDRESS) as u16;
-            let high_byte = self.memory_mapper.read(RESET_VECTOR_ADDRESS + 1) as u16;
-            (high_byte << 8) + low_byte
-        };
+        self.instruction_brk(InterruptState::Reset);
     }
 
     /// Initializes the CPU to a state ready to run instructions. The memory mapper initialization must be
@@ -229,14 +224,14 @@ impl<M: Mapper, I: Interrupts> Cpu<M, I> {
         // check for non-maskable interrupts
         if self.interrupts.non_maskable_interrupt_state() {
             self.interrupts.set_non_maskable_interrupt_state(false);
-            return self.instruction_brk(true)
+            return self.instruction_brk(InterruptState::NonMaskableInterrupt)
         } 
 
         // check for interrupts and make sure we don't have interrupts disabled
         let interrupts_disabled = (self.processor_status.0 & 0b0000_0100) != 0;
         if self.interrupts.interrupt_state() && !interrupts_disabled {
             self.interrupts.set_interrupt_state(false);
-            return self.instruction_brk(true)
+            return self.instruction_brk(InterruptState::MaskableInterrupt)
         }
 
         // normal fetch
@@ -336,7 +331,7 @@ impl<M: Mapper, I: Interrupts> Cpu<M, I> {
             Opcode::BMI => self.instruction_bmi(instruction.low_byte),
             Opcode::BNE => self.instruction_bne(instruction.low_byte),
             Opcode::BPL => self.instruction_bpl(instruction.low_byte),
-            Opcode::BRK => self.instruction_brk(false),
+            Opcode::BRK => self.instruction_brk(InterruptState::Inactive),
             Opcode::BVC => self.instruction_bvc(instruction.low_byte),
             Opcode::BVS => self.instruction_bvs(instruction.low_byte),
             Opcode::CLC => self.instruction_clc(),
