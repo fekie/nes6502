@@ -11,19 +11,21 @@ pub const IRQ_BRK_VECTOR_ADDRESS: u16 = 0xFFFE;
 mod instruction;
 mod processor_status;
 
+/// The Cpu Memory Mapper represented as a trait to allow for shared data flexibility when writing a full emulator.
 pub trait Mapper {
     fn read(&self, address: u16) -> u8;
 
     fn write(&mut self, address: u16, byte: u8);
 }
 
+/// The CPU Interrupts represented as a trait to allow for shared data flexibility when writing a full emulator.
 pub trait Interrupts {
     /// Returns true if there is an interrupt.
     fn interrupt_state(&self) -> bool;
 
     fn set_interrupt_state(&mut self, new_state: bool);
 
-    /// Returns true if there is a maskable interrupt.
+    /// Returns true if there is a non-maskable interrupt.
     fn non_maskable_interrupt_state(&self) -> bool;
 
     fn set_non_maskable_interrupt_state(&mut self, new_state: bool);
@@ -110,7 +112,7 @@ pub struct Cpu<M: Mapper, I: Interrupts> {
 }
 
 /// The state of the CPU. The `ram` field is the non-zero memory
-/// locations in [address, value]
+/// locations in [address, value].
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, Ord, PartialOrd, Default)]
 pub struct CpuState {
     pub pc: u16,
@@ -287,7 +289,7 @@ impl<M: Mapper, I: Interrupts> Cpu<M, I> {
     }
 
     /// Fetches the next instruction and updates the program counter.
-    pub fn fetch(&mut self) -> Option<Instruction> {
+    fn fetch(&mut self) -> Option<Instruction> {
         let full_opcode = match FullOpcode::try_new(self.memory_mapper.read(self.program_counter)) {
             Some(x) => x,
             None => return None,
@@ -336,7 +338,7 @@ impl<M: Mapper, I: Interrupts> Cpu<M, I> {
     }
 
     /// Executes the instruction and returns the amount of machine cycles that it took.
-    pub fn execute(&mut self, instruction: Instruction) -> u8 {
+    fn execute(&mut self, instruction: Instruction) -> u8 {
         match instruction.opcode {
             Opcode::ADC => self.instruction_adc(
                 instruction.addressing_mode,
@@ -491,6 +493,8 @@ impl<M: Mapper, I: Interrupts> Cpu<M, I> {
         self.memory_mapper.read(address)
     }
 
+    // Shortcuts to read a byte from the memory mapper because
+    // we use this a lot.
     pub fn write(&mut self, address: u16, value: u8) {
         self.memory_mapper.write(address, value);
     }
@@ -500,8 +504,8 @@ impl<M: Mapper, I: Interrupts> Cpu<M, I> {
     /// before execution to work correctly.
     pub fn pretty_print_cpu_state(&self, instruction: Instruction) {
         println!("------------------------------------");
-        println!("New PC: ${:02X}", self.program_counter);
-        println!("Instruction (not yet executed): {:#?}", instruction);
+        println!("PC (post-fetch): ${:02X}", self.program_counter);
+        println!("Instruction (pre-execution): {:#?}", instruction);
         println!(
             "Accumulator: {} | X: {} | Y: {}",
             self.accumulator, self.x, self.y
