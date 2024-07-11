@@ -224,7 +224,7 @@ impl<M: Mapper, I: Interrupts> Cpu<M, I> {
     }
 
     /// Runs a full instruction cycle. Returns the amount of
-    /// machine cycles taken.
+    /// cpu cycles taken.
     pub fn cycle(&mut self) -> u8 {
         // check for non-maskable interrupts
         if self.interrupts.non_maskable_interrupt_state() {
