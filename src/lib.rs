@@ -34,7 +34,7 @@ pub trait Interrupts {
 /// # Examples
 /// ### Creating a memory mapper mapped to 64KB of ram.
 /// ```
-/// use nes6502::{Cpu, Mapper};
+/// use nes6502::{Cpu, Mapper, Interrupts};
 ///
 /// struct Memory([u8; 0x10000]);
 ///
@@ -53,10 +53,43 @@ pub trait Interrupts {
 ///         self.0[address as usize] = byte
 ///     }
 /// }
+/// 
+/// pub struct InterruptsContainer {
+///     pub interrupt: bool,
+///     pub non_maskable_interrupt: bool,
+/// }
+/// 
+/// impl InterruptsContainer {
+///     fn new() -> Self {
+///         Self {
+///             interrupt: false,
+///             non_maskable_interrupt: false,
+///         }
+///     }
+/// }
+/// 
+/// impl Interrupts for InterruptsContainer {
+///     fn interrupt_state(&self) -> bool {
+///         self.interrupt
+///     }
+/// 
+///     fn set_interrupt_state(&mut self, new_state: bool) {
+///         self.interrupt = new_state;
+///     }
+/// 
+///     fn non_maskable_interrupt_state(&self) -> bool {
+///         self.non_maskable_interrupt
+///     }
+/// 
+///     fn set_non_maskable_interrupt_state(&mut self, new_state: bool) {
+///         self.non_maskable_interrupt = new_state;
+///     }
+/// }
 ///
 ///
 /// let memory = Memory::new();
-/// let mut cpu = Cpu::new(memory);
+/// let interrupts = InterruptsContainer::new();
+/// let mut cpu = Cpu::new(memory, interrupts);
 ///
 /// let machine_cycles_taken = cpu.cycle();
 ///
