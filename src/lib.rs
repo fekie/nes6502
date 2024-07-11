@@ -212,7 +212,8 @@ impl<M: Mapper, I: Interrupts> Cpu<M, I> {
         };
     }
 
-    /// Initializes the CPU to a state ready to run instructions.
+    /// Initializes the CPU to a state ready to run instructions. The memory mapper initialization must be
+    /// written and called by the struct author.
     pub fn initialize(&mut self) {
         self.reset();
         self.initialized = true;
