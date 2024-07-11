@@ -3,7 +3,7 @@ use processor_status::ProcessorStatus;
 use sonic_rs::{Deserialize, Serialize};
 use instruction::execution::system::InterruptState;
 
-pub const STACK_POINTER_STARTING_VALUE: u8 = 0xFD;
+pub const STACK_POINTER_STARTING_VALUE: u8 = 0x00;
 pub const NMI_VECTOR_ADDRESS: u16 = 0xFFFA;
 pub const RESET_VECTOR_ADDRESS: u16 = 0xFFFC;
 pub const IRQ_BRK_VECTOR_ADDRESS: u16 = 0xFFFE;
